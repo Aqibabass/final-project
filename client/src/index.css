@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+input[type='text'],input[type='password'],
+input[type='email'], input[type='number'],
+input[type='tel'],
+textarea{
+    @apply w-full border my-1 py-2 px-3 rounded-2xl;
+}
+textarea{
+    height: 140px;
+}
+button{
+    @apply bg-gray-300;
+
+}
+/* Modal overlay */
+.modal {
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent dark background */
+    backdrop-filter: blur(5px); /* Optional: Adds a blur effect on the background */
+  }
+  
+  /* Modal box */
+  .modal-box {
+    background-color: #fff; /* Set background to white for the modal box */
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 600px;
+    width: 100%;
+  }
+  
+  /* Modal action buttons */
+  .modal-action button {
+    background-color: #007bff; /* Primary button color */
+    color: white;
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  /* Optional: Add animation or transition */
+  .modal-box {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .modal[open] .modal-box {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+button.primary{
+    background-color: #0d9488;
+    @apply bg-primary p-2 w-full text-white rounded-2xl
+}
+input:focus {
+  outline: none;
+}
