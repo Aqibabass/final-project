@@ -92,13 +92,20 @@ function CreateTrip() {
 
     const GetUserProfile = async (accessToken) => {
         try {
-            const response = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`, {
+            const response = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`, {
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
-            console.log('User Profile:', response.data);
-            localStorage.setItem('user', JSON.stringify(response.data));
-            setOpenDialog(false); 
-            OnGenerateTrip();  
+    
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            console.log('User Profile:', data);
+            localStorage.setItem('user', JSON.stringify(data));
+    
+            setOpenDialog(false);
+            OnGenerateTrip();
         } catch (error) {
             console.error('Error fetching user profile:', error);
         }
@@ -186,7 +193,7 @@ function CreateTrip() {
             </div>
 
             <div className='my-16 flex justify-center'>
-                <Button
+                <Button className='text-white'
                     disabled={loading}
                     onClick={OnGenerateTrip}>
                     {loading ? 
@@ -195,16 +202,16 @@ function CreateTrip() {
                 </Button>
             </div>
 
-            <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-                <DialogContent>
+            <Dialog  open={openDialog} onOpenChange={setOpenDialog}>
+                <DialogContent className="bg-white">
                     <DialogHeader>
                         <DialogDescription>
                             <img src='/logo.svg' />
                             <h2 className='font-bold text-lg mt-7 flex gap-4 items-center '>Sign In With Google</h2>
-                            <p> Sign in securely using your Google account</p>
+                            <p >  Sign in securely using your Google account</p>
                             <Button
                                 onClick={login}
-                                className='mt-5 w-full'>
+                                className='mt-5 text-white w-full'>
                                 <FcGoogle className='h-7 w-7' />
                                 Sign in with google
                             </Button>
