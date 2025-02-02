@@ -5,27 +5,25 @@ import { chatSession } from '@/service/AIModel';
 import React, { useEffect, useState } from 'react';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import { toast } from 'sonner';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-} from "@/components/ui/dialog";
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from "@/service/firebaseConfig";
-import { FcGoogle } from "react-icons/fc";
-import { useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useNavigate } from 'react-router-dom';
 
 function CreateTrip() {
     const [place, setPlace] = useState();
     const [formData, setFormData] = useState({});
-    const [openDialog, setOpenDialog] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            localStorage.setItem('redirectAfterLogin', window.location.pathname);
+            navigate("/login");
+        }
+    }, [navigate]);
 
     const handleInputChange = (name, value) => {
         setFormData({
@@ -34,45 +32,35 @@ function CreateTrip() {
         });
     };
 
-    useEffect(() => {
-        console.log(formData);
-    }, [formData]);
-
-    const login = useGoogleLogin({
-        onSuccess: (codeResp) => {
-            const accessToken = codeResp?.access_token;
-            if (accessToken) {
-                GetUserProfile(accessToken);
-            }
-        },
-        onError: (error) => console.log(error),
-    });
-
     const OnGenerateTrip = async () => {
         const user = JSON.parse(localStorage.getItem('user'));
 
         if (!user) {
-            setOpenDialog(true);
+            navigate("/login");
             return;
         }
 
-        if (formData?.noOfDays > 5 && !formData?.location || !formData?.budget || !formData?.traveller) {
+        if (!formData?.location || !formData?.budget || !formData?.traveller || !formData?.noOfDays) {
             toast("Please fill all details");
-            setOpenDialog(false);
             return;
         }
+
         setLoading(true);
         const FINAL_PROMPT = AI_PROMPT
             .replace('{location}', formData?.location?.label)
             .replace('{totalDays}', formData?.noOfDays)
             .replace('{traveller}', formData?.traveller)
-            .replace('{budget}', formData?.budget)
-            .replace('{totalDays}', formData?.noOfDays);
+            .replace('{budget}', formData?.budget);
 
-        const result = await chatSession.sendMessage(FINAL_PROMPT);
-        console.log(result?.response?.text());
-        setLoading(false);
-        SaveAiTrip(result?.response?.text());
+        try {
+            const result = await chatSession.sendMessage(FINAL_PROMPT);
+            SaveAiTrip(result?.response?.text());
+        } catch (error) {
+            console.error('AI Trip Generation failed:', error);
+            toast("Something went wrong. Try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const SaveAiTrip = async (TripData) => {
@@ -80,34 +68,19 @@ function CreateTrip() {
         const user = JSON.parse(localStorage.getItem('user'));
         const docId = Date.now().toString();
 
-        await setDoc(doc(db, "AITrips", docId), {
-            userSelection: formData,
-            tripData: JSON.parse(TripData),
-            userEmail: user?.email,
-            id: docId
-        });
-        setLoading(false);
-        navigate(`/view-trip/${docId}`);
-    };
-
-    const GetUserProfile = async (accessToken) => {
         try {
-            const response = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`, {
-                headers: { Authorization: `Bearer ${accessToken}` },
+            await setDoc(doc(db, "AITrips", docId), {
+                userSelection: formData,
+                tripData: JSON.parse(TripData),
+                userEmail: user?.email,
+                id: docId
             });
-    
-            if (!response.ok) {
-                throw new Error(`HTTP Error: ${response.status}`);
-            }
-    
-            const data = await response.json();
-            console.log('User Profile:', data);
-            localStorage.setItem('user', JSON.stringify(data));
-    
-            setOpenDialog(false);
-            OnGenerateTrip();
+            navigate(`/view-trip/${docId}`);
         } catch (error) {
-            console.error('Error fetching user profile:', error);
+            console.error('Error saving trip:', error);
+            toast("Failed to save trip. Try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -152,16 +125,13 @@ function CreateTrip() {
                 </div>
 
                 <div className='mt-12'>
-                    <h2 className='text-xl my-3 font-medium'>
-                        What is your Budget?
-                    </h2>
+                    <h2 className='text-xl my-3 font-medium'>What is your Budget?</h2>
                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5'>
                         {SelectBudgetOptions.map((item, index) => (
                             <div
                                 key={index}
                                 onClick={() => handleInputChange('budget', item.title)}
-                                className={`p-4 border rounded-lg hover:shadow-lg 
-                                    ${formData?.budget == item.title && 'shadow-lg border-black'}`}
+                                className={`p-4 border rounded-lg hover:shadow-lg ${formData?.budget === item.title && 'shadow-lg border-black'}`}
                             >
                                 <h2 className='text-4xl'>{item.icon}</h2>
                                 <h2 className='font-bold text-lg'>{item.title}</h2>
@@ -172,16 +142,13 @@ function CreateTrip() {
                 </div>
 
                 <div className='mt-12'>
-                    <h2 className='text-xl my-3 font-medium'>
-                        Who do you plan to go with on your next adventure?
-                    </h2>
+                    <h2 className='text-xl my-3 font-medium'>Who do you plan to go with on your next adventure?</h2>
                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5'>
                         {SelectTravelsList.map((item, index) => (
                             <div
                                 key={index}
                                 onClick={() => handleInputChange('traveller', item.people)}
-                                className={`p-4 border rounded-lg hover:shadow-lg 
-                                    ${formData?.traveller == item.people && 'shadow-lg border-black'}`}
+                                className={`p-4 border rounded-lg hover:shadow-lg ${formData?.traveller === item.people && 'shadow-lg border-black'}`}
                             >
                                 <h2 className='text-4xl'>{item.icon}</h2>
                                 <h2 className='font-bold text-lg'>{item.title}</h2>
@@ -193,33 +160,10 @@ function CreateTrip() {
             </div>
 
             <div className='my-16 flex justify-center'>
-                <Button className='text-white'
-                    disabled={loading}
-                    onClick={OnGenerateTrip}>
-                    {loading ? 
-                        <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin' /> : 'Generate Trip'
-                    }
+                <Button className='text-white' disabled={loading} onClick={OnGenerateTrip}>
+                    {loading ? <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin' /> : 'Generate Trip'}
                 </Button>
             </div>
-
-            <Dialog  open={openDialog} onOpenChange={setOpenDialog}>
-                <DialogContent className="bg-white">
-                    <DialogHeader>
-                        <DialogDescription>
-                            <img src='/logo.svg' />
-                            <h2 className='font-bold text-lg mt-7 flex gap-4 items-center '>Sign In With Google</h2>
-                            <p >  Sign in securely using your Google account</p>
-                            <Button
-                                onClick={login}
-                                className='mt-5 text-white w-full'>
-                                <FcGoogle className='h-7 w-7' />
-                                Sign in with google
-                            </Button>
-                        </DialogDescription>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
-            
         </div>
     );
 }

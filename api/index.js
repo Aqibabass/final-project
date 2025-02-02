@@ -297,4 +297,74 @@ app.delete('/places/:id', async (req, res) => {
     res.status(500).json({ error: 'Server error while deleting place' });
   }
 });
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Add this before other routes
+app.post('/google-login', async (req, res) => {
+    const { token } = req.body;
+    
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+        
+        const payload = ticket.getPayload();
+        const { sub: googleId, name, email, picture } = payload;
+
+        // Check if user exists
+        let user = await User.findOne({ 
+            $or: [
+                { googleId },
+                { email }
+            ]
+        });
+
+        if (!user) {
+            // Create new user if doesn't exist
+            user = await User.create({
+                googleId,
+                name,
+                email,
+                avatar: picture
+            });
+        }
+
+        // Generate JWT token
+        jwt.sign(
+            { email: user.email, id: user._id },
+            jwtSecret,
+            {},
+            (err, token) => {
+                if (err) throw err;
+                res.cookie('token', token, { httpOnly: true }).json({
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    avatar: user.avatar
+                });
+            }
+        );
+    } catch (error) {
+        console.error('Google login error:', error);
+        res.status(400).json({ message: 'Google login failed' });
+    }
+});
+app.get('/profile', async (req, res) => {
+  const { token } = req.cookies;
+  if (token) {
+      jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+          if (err) throw err;
+          const { name, email, _id, avatar } = await User.findById(userData.id);
+          res.json({ name, email, _id, avatar });
+      });
+  } else {
+      res.json(null);
+  }
+});
+app.use(cors({
+  credentials: true,
+  origin: ['http://localhost:5173', 'https://your-production-domain.com']
+}));
 app.listen(4000);

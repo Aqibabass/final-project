@@ -2,6 +2,8 @@ import { UserContext } from '@/UserContext';
 import axios from 'axios';
 import React, { useState, useContext } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
+import { FcGoogle } from 'react-icons/fc';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,6 +12,8 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { setUser } = useContext(UserContext);
+
+  const redirectAfterLogin = localStorage.getItem('redirectAfterLogin') || '/';
 
   async function handleLoginSubmit(ev) {
     ev.preventDefault();
@@ -34,8 +38,20 @@ function LoginPage() {
     }
   }
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const response = await axios.post('/google-login', {
+        token: credentialResponse.credential
+      });
+      setUser(response.data);
+      setRedirect(true);
+    } catch (error) {
+      setError('Google login failed');
+    }
+  };
+
   if (redirect) {
-    return <Navigate to={'/'} />;
+    return <Navigate to={redirectAfterLogin} />;
   }
 
   return (
@@ -59,6 +75,34 @@ function LoginPage() {
           <button className="primary" type="submit" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
+          
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">or</span>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google login failed')}
+              useOneTap
+              render={({ onClick }) => (
+                <button
+                  type="button"
+                  onClick={onClick}
+                  className="flex items-center gap-2 px-4 py-2 border rounded-full hover:bg-gray-50 transition-colors"
+                >
+                  <FcGoogle className="h-6 w-6" />
+                  Continue with Google
+                </button>
+              )}
+            />
+          </div>
+
           <div className="text-center py-2 text-gray-500">
             Don't have an account?{' '}
             <Link className="underline text-black" to={'/register'}>

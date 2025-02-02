@@ -1,6 +1,5 @@
 import axios from "axios";
-import { useEffect } from "react";
-import { createContext, useState } from "react";
+import { useEffect, createContext, useState } from "react";
 
 export const UserContext = createContext({});
 
@@ -8,17 +7,28 @@ export function UserContextProvider({ children }) {
     const [user, setUser] = useState(null);
     const [ready, setReady] = useState(false);
 
-        useEffect(()=> {
-        if(!user){
-            const{data}= axios.get('/profile').then(({data} )=> {
-
-                setUser(data); 
+    useEffect(() => {
+        axios.get('/profile')
+            .then(({ data }) => {
+                setUser(data);
+                setReady(true);
+            })
+            .catch(() => {
                 setReady(true);
             });
-        }
-        },[]);
+    }, []);
+
+    const updateUser = (userData) => {
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+    };
+
     return (
-        <UserContext.Provider value={{ user, setUser, ready}}>
+        <UserContext.Provider value={{ 
+            user, 
+            setUser: updateUser, 
+            ready 
+        }}>
             {children}
         </UserContext.Provider>
     );
