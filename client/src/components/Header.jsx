@@ -86,50 +86,55 @@ function Header({ handleSearch }) {
       </header>
 
       {isMenuOpen && (
-        <ul className="menu border bg-white rounded-box mr-6 w-max mt-2 p-4 shadow-lg z-50 absolute right-0 top-16">
-          <li>
-            <Link to="/index" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
-              Stays
-            </Link>
-          </li>
-          <li>
-            <Link to="/create-trip" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
-              Experiences
-            </Link>
-          </li>
+  <ul className="menu border bg-white rounded-box mr-6 w-max mt-2 p-4 shadow-lg z-50 absolute right-0 top-16">
+    <li>
+      <Link to="/index" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+        Stays
+      </Link>
+    </li>
+    <li>
+      <Link to="/create-trip" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+        Experiences
+      </Link>
+    </li>
 
-          {!user ? (
-            <>
-              <li>
-                <Link to="/login" className="block text-gray-600 hover:bg-gray-200  py-2 px-4 rounded" onClick={closeMenu}>
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link to="/register" className="block text-gray-600 hover:bg-gray-200  py-2 px-4 rounded" onClick={closeMenu}>
-                  Register
-                </Link>
-              </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <Link to="/account" className="block text-gray-600 hover:bg-gray-200  py-2 px-4 rounded" onClick={closeMenu}>
-                  Account
-                </Link>
-              </li>
-              <li>
-                <button
-                  className="block bg-white text-gray-600 hover:bg-gray-200  hover:underline py-2 px-4 rounded"
-                  onClick={() => { logout(); closeMenu(); }}
-                >
-                  Logout
-                </button>
-              </li>
-            </>
-          )}
-        </ul>
-      )}
+    {!user ? (
+      <>
+        <li>
+          <Link to="/login" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+            Login
+          </Link>
+        </li>
+        <li>
+          <Link to="/register" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+            Register
+          </Link>
+        </li>
+      </>
+    ) : (
+      <>
+        <li>
+          <Link to="/account" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+            Account
+          </Link>
+        </li>
+        <li>
+          <Link to="/my-trips" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+            My Trips
+          </Link>
+        </li>
+        <li>
+          <button
+            className="block bg-white text-gray-600 hover:bg-gray-200 hover:underline py-2 px-4 rounded"
+            onClick={() => { logout(); closeMenu(); }}
+          >
+            Logout
+          </button>
+        </li>
+      </>
+    )}
+  </ul>
+)}
     </div>
   );
 }
