@@ -19,7 +19,7 @@ import { Toaster } from "./components/ui/sonner";
 
 
 axios.defaults.baseURL = 'http://localhost:4000';
-axios.defaults.withCredentials = true;
+
 
 function App() {
   return (
