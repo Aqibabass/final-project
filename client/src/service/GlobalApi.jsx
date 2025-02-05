@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const BASE_URL = 'https://places.googleapis.com/v1/places:searchText'; 
-
+axios.defaults.withCredentials = false;
 const config = {
     headers: {
         'Content-Type': 'application/json',

@@ -4,7 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import Layout from "./Layout";
 import RegisterPage from "./pages/RegisterPage";
 import axios from "axios";
-import { UserContextProvider } from "./UserContext";
+
 import ProfilePage from "./pages/ProfilePage";
 import PlacesFormPage from "./pages/PlacesFormPage";
 import PlacesPage from "./pages/PlacesPage";
@@ -15,19 +15,29 @@ import Hero from "./components/Hero";
 import CreateTrip from "./create-trip";
 import ViewTrip from "./view-trip/[tripId]/index.jsx";
 import MyTrips from "./my-trips";
-import { Toaster } from "./components/ui/sonner";
 
-axios.defaults.baseURL = 'http://localhost:4000'; 
+import React from "react";
+import { Toaster } from "./components/ui/sonner";
+import { UserContextProvider } from "./UserContext";
+
+axios.defaults.baseURL = 'http://localhost:4000';
+axios.defaults.withCredentials = true;
 
 function App() {
   const location = useLocation();
 
-  // Conditional withCredntials
-  if (location.pathname === '/view-trip' || location.pathname.startsWith('/my-trips')) {
-    axios.defaults.withCredentials = false;
-  } else {
-    axios.defaults.withCredentials = true;
-  }
+  
+  React.useEffect(() => {
+    if (
+      location.pathname.startsWith("/create-trip") ||
+      location.pathname.startsWith("/view-trip") ||
+      location.pathname.startsWith("/my-trips")
+    ) {
+      axios.defaults.withCredentials = false;
+    } else {
+      axios.defaults.withCredentials = true;
+    }
+  }, [location]);
 
   return (
     <UserContextProvider>
@@ -45,7 +55,7 @@ function App() {
           <Route path="/place/:id" element={<PlacePage />} />
           <Route path="/account/bookings" element={<BookingsPage />} />
           <Route path="/account/bookings/:id" element={<BookingPage />} />
-
+          
           <Route path="/create-trip" element={<CreateTrip />} />
           <Route path="/view-trip/:tripId" element={<ViewTrip />} />
           <Route path="/my-trips" element={<MyTrips />} />

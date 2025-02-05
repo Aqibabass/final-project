@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { GetPlaceDetails } from '@/service/GlobalApi';
 import React, { useEffect, useState } from 'react';
-import { IoIosSend } from "react-icons/io";
+import { IoLocationSharp } from "react-icons/io5";
+
 
 const PHOTO_REF_URL = 'https://places.googleapis.com/v1/{NAME}/media?maxHeightPx=1000&maxWidthPx=1000&key=' + import.meta.env.VITE_GOOGLE_PLACE_API_KEY;
 
@@ -51,8 +52,9 @@ function InfoSection({ trip }) {
                         </h2>
                     </div>
                 </div>
-                <Button className="mt-10 p-3 flex flex-col gap-2" onClick={handleButtonClick}>
-                    <IoIosSend />
+                <Button className="mt-10 p-3 border  rounded-btn text-white bg-white hover:bg-gray-200 flex flex-col gap-2" onClick={handleButtonClick}>
+               
+                <IoLocationSharp className='text-red-600'/>
                 </Button>
             </div>
         </div>
