@@ -89,19 +89,18 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/profile', async(req, res) => {
+
+app.get('/profile', async (req, res) => {
   const { token } = req.cookies;
   if (token) {
-    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-      if (err) throw err;
-      const { name, email, _id } = await User.findById(userData.id)
-      res.json({ name, email, _id });
-    });
+      jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+          if (err) throw err;
+          const { name, email, _id, avatar } = await User.findById(userData.id);
+          res.json({ name, email, _id, avatar });
+      });
   } else {
-    res.json(null);
+      res.json(null);
   }
-
-
 });
 
 app.post('/logout', (req, res) => {
@@ -363,8 +362,5 @@ app.get('/profile', async (req, res) => {
       res.json(null);
   }
 });
-app.use(cors({
-  credentials: true,
-  origin: ['http://localhost:5173', 'https://your-production-domain.com']
-}));
+
 app.listen(4000);

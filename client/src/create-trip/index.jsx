@@ -20,7 +20,6 @@ function CreateTrip() {
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
-            localStorage.setItem('redirectAfterLogin', window.location.pathname);
             navigate("/login");
         }
     }, [navigate]);

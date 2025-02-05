@@ -1,7 +1,7 @@
 import { UserContext } from '@/UserContext';
 import axios from 'axios';
 import React, { useState, useContext } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { FcGoogle } from 'react-icons/fc';
 
@@ -11,9 +11,8 @@ function LoginPage() {
   const [redirect, setRedirect] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { setUser } = useContext(UserContext);
-
-  const redirectAfterLogin = localStorage.getItem('redirectAfterLogin') || '/';
 
   async function handleLoginSubmit(ev) {
     ev.preventDefault();
@@ -29,8 +28,9 @@ function LoginPage() {
     try {
       const { data } = await axios.post('/login', { email, password });
       setUser(data);
+      setIsLoggedIn(true); // Update login status
       alert('Login successful');
-      setRedirect(true);
+      setTimeout(() => setRedirect(true), 1500); // Redirect after showing message
     } catch (e) {
       setError(e.response?.data?.message || 'Login failed. Please try again.');
     } finally {
@@ -44,14 +44,15 @@ function LoginPage() {
         token: credentialResponse.credential
       });
       setUser(response.data);
-      setRedirect(true);
+      setIsLoggedIn(true); 
+      setTimeout(() => setRedirect(true), 1500);
     } catch (error) {
       setError('Google login failed');
     }
   };
 
   if (redirect) {
-    return <Navigate to={redirectAfterLogin} />;
+    return <Navigate to="/index" />;
   }
 
   return (
@@ -72,6 +73,11 @@ function LoginPage() {
             onChange={(ev) => setPassword(ev.target.value)}
           />
           {error && <p className="p-1 text-red-500 text-center">{error}</p>}
+          
+          {isLoggedIn && (
+            <p className="p-1 text-green-500 text-center">You are logged in!</p>
+          )}
+
           <button className="primary" type="submit" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
