@@ -82,7 +82,7 @@ function PlacesFormPage() {
     }
 
     return (
-        <div>
+        <div className='mb-8'>
             <AccountNav />
             <form onSubmit={savePlace}>
                 {preInput('Title', 'Provide a catchy title for your place, like an advertisement.')}

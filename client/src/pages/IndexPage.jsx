@@ -39,7 +39,7 @@ function IndexPage() {
     <div>
       <Header places={places} setFilteredPlaces={setFilteredPlaces} handleSearch={handleSearch} />
 
-      <div className="mt-8 grid gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-8 mb-8 grid gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {loading ? (
           <div>Loading...</div>
         ) : filteredPlaces.length > 0 ? (
