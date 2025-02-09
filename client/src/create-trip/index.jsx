@@ -9,6 +9,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from "@/service/firebaseConfig";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useNavigate } from 'react-router-dom';
+import Footer from '@/components/Footer';
 
 function CreateTrip() {
     const [place, setPlace] = useState();
@@ -86,20 +87,20 @@ function CreateTrip() {
     return (
         <div>
             <div className='mb-8 sm:px-4 md:px-4 lg:px-4 xl:px-4 px-2 mt-8'>
-                <h2 className='font-bold text-3xl text-center sm:text-4xl'>
+                <h2 className='font-bold text-3xl  sm:text-4xl'>
                     Tell us your travel preferences 🏖️🏕️
                 </h2>
-                <p className='mt-3 text-gray-500 text-xl text-center'>
+                <p className='mt-3 text-gray-500 text-xl '>
                     Just provide some basic information, and our trip planner will generate a customized itinerary based on your preferences.
                 </p>
 
-                <div className='mt-14 flex flex-col gap-10'>
+                <div className='mt-12 flex flex-col gap-10'>
                     <div className='flex flex-col sm:flex-row gap-5'>
                         <div className='flex-1'>
                             <h2 className='text-xl my-3 font-medium'>
                                 What is your destination of choice?
                             </h2>
-                            <GooglePlacesAutocomplete
+                            <GooglePlacesAutocomplete 
                                 apiKey={import.meta.env.VITE_GOOGLE_PLACE_API_KEY}
                                 selectProps={{
                                     place,
@@ -115,6 +116,7 @@ function CreateTrip() {
                                 How many days are you planning for your trip?
                             </h2>
                             <Input
+                            className='text-gray-600'
                                 placeholder={'Ex.3'}
                                 type="number"
                                 onChange={(e) => handleInputChange('noOfDays', e.target.value)}
@@ -163,6 +165,7 @@ function CreateTrip() {
                     {loading ? <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin' /> : 'Generate Trip'}
                 </Button>
             </div>
+            <Footer/>
         </div>
     );
 }

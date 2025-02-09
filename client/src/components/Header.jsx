@@ -29,7 +29,7 @@ function Header({ handleSearch }) {
   }, [location]);
 
   return (
-    <div className="bg-white -mx-6 px-8 py-4">
+    <div className="bg-white -mx-6 md:px-6 md:py-4 lg:px-7 lg:py-4 px-6 py-4">
       <header className="flex w-auto justify-between items-center relative">
         <Link to={'/index'} className="flex items-center gap-1">
           <LuMapPinHouse className='size-7' />
@@ -74,10 +74,10 @@ function Header({ handleSearch }) {
             <div className={`rounded-full border border-gray-300 overflow-hidden ${!user?.avatar ? 'bg-gray-500' : ''}`}>
               {user?.avatar ? (
                 <img
-                  src={user.avatar}  // Use user.avatar instead of user.picture
+                  src={user.avatar}
                   alt="Profile"
                   className="size-6 object-cover"
-                  onError={(e) => e.target.src = '/default-avatar.png'}  // Add a default fallback image if it fails to load
+                  onError={(e) => e.target.src = '/default-avatar.png'} 
                 />
               ) : (
                 <div className="bg-gray-500 text-white rounded-full border border-gray-500 overflow-hidden">

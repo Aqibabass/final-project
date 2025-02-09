@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 function IndexPage() {
   const [places, setPlaces] = useState([]);
@@ -38,8 +39,9 @@ function IndexPage() {
   return (
     <div>
       <Header places={places} setFilteredPlaces={setFilteredPlaces} handleSearch={handleSearch} />
-
-      <div className="mt-12 mb-8 grid gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <h2 className='font-bold text-3xl p-2  mt-6'>Find Your Perfect Stay</h2>
+      <div className="mt-6 mb-8 grid px-2 gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        
         {loading ? (
           <div>Loading...</div>
         ) : filteredPlaces.length > 0 ? (
@@ -55,17 +57,18 @@ function IndexPage() {
                   />
                 )}
               </div>
-              <h2 className="font-medium text-xl mt-2">{place.address}</h2>
-              <h3 className="mt-2 font-medium text-gray-500">{place.title}</h3>
-              <div className="mt-2 font-semibold text-lg">
+              <h2 className="font-medium lg:text-lg md:text-lg text-base mt-2 ">{place.address}</h2>
+              <h3 className="mt-1 font-medium md:text-sm text-xs text-gray-500 truncate">{place.title}</h3>
+              <div className="mt-1 font-semibold lg:text-lg md:text-base text-sm">
                 ₹{place.price} per night
               </div>
             </Link>
           ))
         ) : (
-          <p>No places found.</p>
+          <p className="items-center text-xl font-bold mb-4">No places found.</p>
         )}
       </div>
+      <Footer  />
     </div>
   );
 }
