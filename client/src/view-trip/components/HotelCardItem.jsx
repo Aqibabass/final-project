@@ -29,7 +29,7 @@ function HotelCardItem({ hotel }) {
   <div className="border rounded-lg p-2 hover:scale-105 transition-transform cursor-pointer mt-3 w-full sm:w-auto flex flex-col h-full">
     <img 
       src={photoUrl || '/placeholder.jpg'} 
-      className="rounded-xl h-[180px] w-full object-cover" 
+      className="rounded-xl lg:h-[280px] md:h-[200px] h-[180px] w-full object-cover" 
       alt={hotel?.hotelName || 'Hotel'} 
     />
     <div className="my-3 flex flex-col gap-2 flex-grow">

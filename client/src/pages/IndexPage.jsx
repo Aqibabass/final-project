@@ -56,7 +56,7 @@ function IndexPage() {
                 )}
               </div>
               <h2 className="font-medium text-xl mt-2">{place.address}</h2>
-              <h3 className="mt-2 font-medium text-gray-600">{place.title}</h3>
+              <h3 className="mt-2 font-medium text-gray-500">{place.title}</h3>
               <div className="mt-2 font-semibold text-lg">
                 ₹{place.price} per night
               </div>

@@ -5,7 +5,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '@/service/firebaseConfig';
 import { UserContext } from '@/UserContext';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton, SkeletonCard } from '@/components/ui/skeleton';
 import UserTripCardItem from './components/UserTripCardItem';
 
 function MyTrips() {
@@ -61,7 +61,10 @@ function MyTrips() {
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
         {loading ? (
           Array(6).fill(0).map((_, index) => (
-            <Skeleton key={index} className="h-[220px] w-full rounded-xl" />
+            <SkeletonCard 
+              key={index} 
+              imageClassName="h-[220px]" 
+            />
           ))
         ) : userTrips.length > 0 ? (
           userTrips.map((trip) => (

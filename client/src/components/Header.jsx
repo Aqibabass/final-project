@@ -71,14 +71,26 @@ function Header({ handleSearch }) {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
-            <div className="bg-gray-500 text-white rounded-full border border-gray-500 overflow-hidden">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 relative top-1">
-                <path
-                  fillRule="evenodd"
-                  d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
-                  clipRule="evenodd"
+            <div className={`rounded-full border border-gray-300 overflow-hidden ${!user?.avatar ? 'bg-gray-500' : ''}`}>
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}  // Use user.avatar instead of user.picture
+                  alt="Profile"
+                  className="size-6 object-cover"
+                  onError={(e) => e.target.src = '/default-avatar.png'}  // Add a default fallback image if it fails to load
                 />
-              </svg>
+              ) : (
+                <div className="bg-gray-500 text-white rounded-full border border-gray-500 overflow-hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 relative top-1">
+                  <path
+                    fillRule="evenodd"
+                    d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+
+              )}
             </div>
             <div className="hidden sm:block">{user?.name}</div>
           </button>
@@ -86,55 +98,55 @@ function Header({ handleSearch }) {
       </header>
 
       {isMenuOpen && (
-  <ul className="menu border bg-white rounded-box mr-6 w-max mt-2 p-4 shadow-lg z-50 absolute right-0 top-16">
-    <li>
-      <Link to="/index" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
-        Stays
-      </Link>
-    </li>
-    <li>
-      <Link to="/create-trip" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
-        Experiences
-      </Link>
-    </li>
+        <ul className="menu border bg-white rounded-box mr-6 w-max mt-2 p-4 shadow-lg z-50 absolute right-0 top-16">
+          <li>
+            <Link to="/index" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+              Stays
+            </Link>
+          </li>
+          <li>
+            <Link to="/create-trip" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+              Experiences
+            </Link>
+          </li>
 
-    {!user ? (
-      <>
-        <li>
-          <Link to="/login" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
-            Login
-          </Link>
-        </li>
-        <li>
-          <Link to="/register" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
-            Register
-          </Link>
-        </li>
-      </>
-    ) : (
-      <>
-        <li>
-          <Link to="/account" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
-            Account
-          </Link>
-        </li>
-        <li>
-          <Link to="/my-trips" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
-            My Trips
-          </Link>
-        </li>
-        <li>
-          <button
-            className="block bg-white text-gray-600 hover:bg-gray-200 hover:underline py-2 px-4 rounded"
-            onClick={() => { logout(); closeMenu(); }}
-          >
-            Logout
-          </button>
-        </li>
-      </>
-    )}
-  </ul>
-)}
+          {!user ? (
+            <>
+              <li>
+                <Link to="/login" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link to="/register" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+                  Register
+                </Link>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link to="/account" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+                  Account
+                </Link>
+              </li>
+              <li>
+                <Link to="/my-trips" className="block text-gray-600 hover:bg-gray-200 py-2 px-4 rounded" onClick={closeMenu}>
+                  My Trips
+                </Link>
+              </li>
+              <li>
+                <button
+                  className="block bg-white text-gray-600 hover:bg-gray-200 hover:underline py-2 px-4 rounded"
+                  onClick={() => { logout(); closeMenu(); }}
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+          )}
+        </ul>
+      )}
     </div>
   );
 }
