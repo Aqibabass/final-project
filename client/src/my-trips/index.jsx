@@ -55,7 +55,7 @@ function MyTrips() {
   };
 
   return (
-    <div className='mb-8 sm:px-10 md:px-16 lg:px-24 xl:px-32 px-5 mt-8 min-h-screen'>
+    <div className='mb-8 sm:px-4 md:px-4 lg:px-4 xl:px-4 px-2 mt-8 min-h-screen'>
       <h2 className='font-bold text-3xl mb-8'>My Trips</h2>
       
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
