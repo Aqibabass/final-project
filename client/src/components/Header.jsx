@@ -74,11 +74,11 @@ function Header({ handleSearch }) {
             <div className={`rounded-full border border-gray-300 overflow-hidden ${!user?.avatar ? 'bg-gray-500' : ''}`}>
               {user?.avatar ? (
                 <img
-                  src={user.avatar}
-                  alt="Profile"
-                  className="size-6 object-cover"
-                  onError={(e) => e.target.src = '/default-avatar.png'} 
-                />
+                src={user.avatar}
+                alt="Profile"
+                className="size-6 object-cover"
+                referrerPolicy="no-referrer"
+              />
               ) : (
                 <div className="bg-gray-500 text-white rounded-full border border-gray-500 overflow-hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 relative top-1">
