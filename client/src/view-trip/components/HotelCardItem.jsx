@@ -6,42 +6,47 @@ function HotelCardItem({ hotel }) {
   const [photoUrl, setPhotoUrl] = useState();
 
   useEffect(() => {
-    hotel && GetPlacePhoto();
-  }, [hotel]);
+    const GetPlacePhoto = async () => {
+      if (!hotel?.hotelName) return;
 
-  const GetPlacePhoto = async () => {
-    const data = {
-      textQuery: hotel?.hotelName,
-    };
-    await GetPlaceDetails(data).then((resp) => {
-      if (resp.data.places[0]?.photos[9]?.name) {
-        const photoUrl = PHOTO_REF_URL.replace('{NAME}', resp.data.places[0].photos[9].name);
-        setPhotoUrl(photoUrl);
+      const data = {
+        textQuery: hotel.hotelName,
+      };
+
+      try {
+        const resp = await GetPlaceDetails(data);
+        if (resp.data.places[0]?.photos[9]?.name) {
+          const photoUrl = PHOTO_REF_URL.replace('{NAME}', resp.data.places[0].photos[9].name);
+          setPhotoUrl(photoUrl);
+        }
+      } catch (error) {
+        console.error("Error fetching hotel photo:", error);
       }
-    });
-  };
+    };
+
+    GetPlacePhoto();
+  }, [hotel]);
 
   return (
     <Link
-  to={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel?.hotelName + ', ' + hotel?.hotelAddress)}`}
-  className="text-black"
->
-  <div className="border rounded-lg p-2 hover:scale-105 transition-transform cursor-pointer mt-3 w-full sm:w-auto flex flex-col h-full">
-    <img 
-      src={photoUrl || '/placeholder.jpg'} 
-      className="rounded-xl lg:h-[280px] md:h-[200px] sm:h-[180px] h-[180px]  w-full object-cover" 
-      alt={hotel?.hotelName || 'Hotel'} 
-    />
-    <div className="my-3 flex flex-col gap-2 flex-grow">
-      <h2 className="font-medium">{hotel?.hotelName}</h2>
-      <h2 className="font-medium text-xs text-gray-500">📍 {hotel?.hotelAddress}</h2>
-      <h2 className="text-sm">💰 {hotel?.price}</h2>
-      <h2 className="text-sm">⭐ {hotel?.rating} stars</h2>
-    </div>
-  </div>
-</Link>
+      to={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel?.hotelName + ', ' + hotel?.hotelAddress)}`}
+      className="text-black"
+    >
+      <div className="border rounded-lg p-2 hover:scale-105 transition-transform cursor-pointer mt-3 w-full sm:w-auto flex flex-col h-full">
+        <img 
+          src={photoUrl || '/placeholder.jpg'} 
+          className="rounded-xl lg:h-[280px] md:h-[200px] sm:h-[180px] h-[180px]  w-full object-cover" 
+          alt={hotel?.hotelName || 'Hotel'} 
+        />
+        <div className="my-3 flex flex-col gap-2 flex-grow">
+          <h2 className="font-medium">{hotel?.hotelName}</h2>
+          <h2 className="font-medium text-xs text-gray-500">📍 {hotel?.hotelAddress}</h2>
+          <h2 className="text-sm">💰 {hotel?.price}</h2>
+          <h2 className="text-sm">⭐ {hotel?.rating} stars</h2>
+        </div>
+      </div>
+    </Link>
   );
 }
 
 export default HotelCardItem;
-
