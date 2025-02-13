@@ -24,6 +24,9 @@ app.use(cors({
 }));
 
 mongoose.connect(process.env.MONGO_URL);
+app.get('/', (req, res) => {
+  res.json('working!');
+});
 
 function getUserDataFromReq(req){
   return new Promise((resolve, reject)=>{
