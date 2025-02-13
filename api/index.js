@@ -24,8 +24,8 @@ app.use(cors({
 }));
 
 mongoose.connect(process.env.MONGO_URL);
-app.get('/', (req, res) => {
-  res.json('working!');
+app.get("/", (req, res) => {
+  res.send("Server is running!");
 });
 
 function getUserDataFromReq(req){
@@ -365,5 +365,6 @@ app.get('/profile', async (req, res) => {
       res.json(null);
   }
 });
+module.exports = app;
 
 app.listen(4000);
