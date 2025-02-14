@@ -21,9 +21,8 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 
 app.use(cors({
   credentials: true,
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL,
 }));
-
 mongoose.connect(process.env.MONGO_URL);
 app.get("/", (req, res) => {
   res.send("Server is running!");
