@@ -11,12 +11,20 @@ function PhotosUploader({ addedPhotos, onChange }) {
 
     async function addPhotoByLink(ev) {
         ev.preventDefault();
-        const { data: filename } = await axios.post('/upload-by-link', { link: photoLink });
-        onChange(prev => {
+        if (!photoLink.trim()) { // Validate empty input
+          alert('Please provide a valid image URL');
+          return;
+        }
+        try {
+          const { data: filename } = await axios.post('/upload-by-link', { link: photoLink });
+          onChange(prev => {
             return [...prev, filename];
-        });
-        setPhotoLink('');
-    }
+          });
+          setPhotoLink('');
+        } catch (error) {
+          alert('Failed to add photo. Please check the URL and try again.');
+        }
+      }
     function uploadPhoto(ev) {
         const files = ev.target.files;
         const data = new FormData();
@@ -33,17 +41,18 @@ function PhotosUploader({ addedPhotos, onChange }) {
 
         })
     }
-    function removePhoto(ev,filename) {
+    function removePhoto(ev, filename) {
         ev.preventDefault();
         onChange([...addedPhotos
             .filter(photo => photo !== filename)]);
     }
-    function selectAsMainPhoto(ev,filename){
+    function selectAsMainPhoto(ev, filename) {
         ev.preventDefault();
-        
-    onChange([filename, ...addedPhotos
-        .filter(photo => photo !== filename)]);
+
+        onChange([filename, ...addedPhotos
+            .filter(photo => photo !== filename)]);
     }
+    const baseUrl = import.meta.env.VITE_BASE_URL;
     return (
         <>
             <div className='flex gap-2'>
@@ -58,27 +67,31 @@ function PhotosUploader({ addedPhotos, onChange }) {
 
                 {addedPhotos.length > 0 && addedPhotos.map(link => (
                     <div className='h-auto w-auto aspect-video flex relative' key={link}>
-                        <img className="rounded-2xl w-full object-cover" src={`http://localhost:4000/uploads/${link}`} alt="" />
+                         <img
+                            className="rounded-2xl w-full object-cover"
+                            src={`${baseUrl}/uploads/${link}`} // dynamically use base URL
+                            alt=""
+                        />
 
                         <button onClick={ev => removePhoto(ev, link)} className="cursor-pointer absolute bottom-1 right-1 text-white bg-black opacity-50 rounded-2xl py-2 px-3">
                             <FaRegTrashAlt />
                         </button>
-                        
+
                         <button onClick={ev => selectAsMainPhoto(ev, link)} className="cursor-pointer absolute bottom-1 left-1 text-white bg-black opacity-50 rounded-2xl py-2 px-3">
-                        {link === addedPhotos[0] && (
-                             
-<GoStarFill />
-                          
-                          
-                        )}
-                        {link !== addedPhotos[0] && (
-                               
-                               <GoStar />
-                         
-                              
-                        )}
-                           
-                          
+                            {link === addedPhotos[0] && (
+
+                                <GoStarFill />
+
+
+                            )}
+                            {link !== addedPhotos[0] && (
+
+                                <GoStar />
+
+
+                            )}
+
+
 
                         </button>
                     </div>

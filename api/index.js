@@ -113,12 +113,23 @@ app.post('/logout', (req, res) => {
 
 app.post('/upload-by-link', async (req, res) => {
   const { link } = req.body;
-  const newName = 'photo' + Date.now() + '.jpg';
-  await imageDownloader.image({
-    url: link,
-    dest: __dirname + '/uploads/' + newName,
-  });
-  res.json(newName);
+  
+
+  if (!link || !link.startsWith('http')) {
+    return res.status(400).json({ error: 'Valid image URL is required' });
+  }
+
+  try {
+    const newName = 'photo' + Date.now() + '.jpg';
+    await imageDownloader.image({
+      url: link,
+      dest: __dirname + '/uploads/' + newName,
+    });
+    res.json(newName);
+  } catch (error) {
+    console.error('Image download failed:', error);
+    res.status(500).json({ error: 'Failed to download image from provided URL' });
+  }
 });
 
 const photosMiddleware = multer({ dest: 'uploads' });
