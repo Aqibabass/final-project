@@ -24,7 +24,7 @@ function PlaceGallery({ place }) {
         onClick={() => setFullScreenPhoto(null)}
       >
         <img
-          src={'http://localhost:4000/uploads/' + fullScreenPhoto}
+          src={`${import.meta.env.VITE_BASE_URL}/uploads/${fullScreenPhoto}`}
           alt="Full Screen"
           className="max-w-full max-h-full rounded-lg"
         />
@@ -54,7 +54,7 @@ function PlaceGallery({ place }) {
               <div key={index} onClick={() => setFullScreenPhoto(photo)}>
                 <img
                   className="w-full h-[300px] sm:h-[400px] object-cover rounded-lg cursor-pointer hover:opacity-80 transition"
-                  src={'http://localhost:4000/uploads/' + photo}
+                  src={`${import.meta.env.VITE_BASE_URL}/uploads/${photo}`}
                   alt={`Photo ${index + 1}`}
                 />
               </div>
@@ -73,7 +73,7 @@ function PlaceGallery({ place }) {
               <img
                 onClick={() => setShowAllPhotos(true)}
                 className="w-full h-full object-cover rounded-tl-xl cursor-pointer"
-                src={'http://localhost:4000/uploads/' + place.photos[0]}
+                src={`${import.meta.env.VITE_BASE_URL}/uploads/${place.photos[0]}`}
                 alt="Main Image"
               />
             </div>
@@ -85,7 +85,7 @@ function PlaceGallery({ place }) {
             <img
               onClick={() => setShowAllPhotos(true)}
               className="w-full h-full object-cover cursor-pointer"
-              src={'http://localhost:4000/uploads/' + place.photos[1]}
+              src={`${import.meta.env.VITE_BASE_URL}/uploads/${place.photos[1]}`}
               alt="Secondary Image 1"
             />
           </div>
@@ -95,7 +95,7 @@ function PlaceGallery({ place }) {
             <img
               onClick={() => setShowAllPhotos(true)}
               className="w-full h-full object-cover cursor-pointer"
-              src={'http://localhost:4000/uploads/' + place.photos[2]}
+              src={`${import.meta.env.VITE_BASE_URL}/uploads/${place.photos[2]}`}
               alt="Secondary Image 2"
             />
           </div>

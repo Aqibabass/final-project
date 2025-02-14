@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '@/components/Header';
@@ -12,7 +12,8 @@ function IndexPage() {
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        const response = await axios.get('/places');
+        
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/places`);
         setPlaces(response.data);
         setFilteredPlaces(response.data);
         setLoading(false);
@@ -52,7 +53,7 @@ function IndexPage() {
                   <img
                     className="rounded-2xl object-cover aspect-square transition-transform
                      duration-300 ease-in-out transform hover:scale-110"
-                    src={`http://localhost:4000/uploads/${place.photos[0]}`}
+                    src={`${import.meta.env.VITE_BASE_URL}/uploads/${place.photos[0]}`}
                     alt={place.title}
                   />
                 )}
@@ -68,7 +69,7 @@ function IndexPage() {
           <p className="items-center text-xl font-bold mb-4">No places found.</p>
         )}
       </div>
-      <Footer  />
+      <Footer />
     </div>
   );
 }

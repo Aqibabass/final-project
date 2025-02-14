@@ -20,13 +20,13 @@ import React from "react";
 import { Toaster } from "./components/ui/sonner";
 import { UserContextProvider } from "./UserContext";
 
-axios.defaults.baseURL = 'http://localhost:4000';
+// Use the VITE_BASE_URL from the .env file
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 axios.defaults.withCredentials = true;
 
 function App() {
   const location = useLocation();
 
-  
   React.useEffect(() => {
     if (
       location.pathname.startsWith("/create-trip") ||
@@ -55,7 +55,7 @@ function App() {
           <Route path="/place/:id" element={<PlacePage />} />
           <Route path="/account/bookings" element={<BookingsPage />} />
           <Route path="/account/bookings/:id" element={<BookingPage />} />
-          
+
           <Route path="/create-trip" element={<CreateTrip />} />
           <Route path="/view-trip/:tripId" element={<ViewTrip />} />
           <Route path="/my-trips" element={<MyTrips />} />
