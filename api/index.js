@@ -21,7 +21,12 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 
 app.use(cors({
   credentials: true,
-  origin: process.env.FRONTEND_URL,
+  origin: [
+    'https://final-project-theta-plum.vercel.app',
+    process.env.FRONTEND_URL
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 mongoose.connect(process.env.MONGO_URL);
 app.get("/", (req, res) => {
