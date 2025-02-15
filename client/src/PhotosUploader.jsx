@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import { GoStarFill, GoStar } from 'react-icons.go';
+import { GoStarFill, GoStar } from 'react-icons/go';
 
 function PhotosUploader({ addedPhotos, onChange }) {
     const [photoLink, setPhotoLink] = useState('');
