@@ -12,7 +12,6 @@ function IndexPage() {
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/places`);
         setPlaces(response.data);
         setFilteredPlaces(response.data);
@@ -53,7 +52,7 @@ function IndexPage() {
                   <img
                     className="rounded-2xl object-cover aspect-square transition-transform
                      duration-300 ease-in-out transform hover:scale-110"
-                    src={`${import.meta.env.VITE_BASE_URL}/uploads/${place.photos[0]}`}
+                    src={place.photos[0]} // Use Cloudinary URL directly
                     alt={place.title}
                   />
                 )}
