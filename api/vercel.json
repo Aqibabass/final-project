@@ -7,7 +7,7 @@
       "use": "@vercel/node"
     },
     {
-      "src": "public/**/*",
+      "src": "src/**/*",
       "use": "@vercel/static"
     }
   ],
@@ -18,10 +18,3 @@
     }
   ]
 }
-<<<<<<< HEAD
-
-
-  
-=======
-  
->>>>>>> 704f6acf5d85cc48c003490f25c625da7047e56f
