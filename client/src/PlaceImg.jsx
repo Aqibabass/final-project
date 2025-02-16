@@ -9,7 +9,7 @@ function PlaceImg({ place, index = 0, className = 'object-cover' }) {
         <div>
             <img
                 className={className}
-                src={`${import.meta.env.VITE_BASE_URL}/uploads/${place.photos[index]}`}
+                src={place.photos[index]} // Use the photo URL directly
                 alt={place.title}
             />
         </div>

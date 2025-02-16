@@ -24,7 +24,7 @@ function PlaceGallery({ place }) {
         onClick={() => setFullScreenPhoto(null)}
       >
         <img
-          src={`${import.meta.env.VITE_BASE_URL}/uploads/${fullScreenPhoto}`}
+          src={fullScreenPhoto} // Use the photo URL directly
           alt="Full Screen"
           className="max-w-full max-h-full rounded-lg"
         />
@@ -54,7 +54,7 @@ function PlaceGallery({ place }) {
               <div key={index} onClick={() => setFullScreenPhoto(photo)}>
                 <img
                   className="w-full h-[300px] sm:h-[400px] object-cover rounded-lg cursor-pointer hover:opacity-80 transition"
-                  src={`${import.meta.env.VITE_BASE_URL}/uploads/${photo}`}
+                  src={photo} // Use the photo URL directly
                   alt={`Photo ${index + 1}`}
                 />
               </div>
@@ -73,7 +73,7 @@ function PlaceGallery({ place }) {
               <img
                 onClick={() => setShowAllPhotos(true)}
                 className="w-full h-full object-cover rounded-tl-xl cursor-pointer"
-                src={`${import.meta.env.VITE_BASE_URL}/uploads/${place.photos[0]}`}
+                src={place.photos[0]} // Use the photo URL directly
                 alt="Main Image"
               />
             </div>
@@ -85,7 +85,7 @@ function PlaceGallery({ place }) {
             <img
               onClick={() => setShowAllPhotos(true)}
               className="w-full h-full object-cover cursor-pointer"
-              src={`${import.meta.env.VITE_BASE_URL}/uploads/${place.photos[1]}`}
+              src={place.photos[1]} // Use the photo URL directly
               alt="Secondary Image 1"
             />
           </div>
@@ -95,7 +95,7 @@ function PlaceGallery({ place }) {
             <img
               onClick={() => setShowAllPhotos(true)}
               className="w-full h-full object-cover cursor-pointer"
-              src={`${import.meta.env.VITE_BASE_URL}/uploads/${place.photos[2]}`}
+              src={place.photos[2]} // Use the photo URL directly
               alt="Secondary Image 2"
             />
           </div>

@@ -60,8 +60,6 @@ function PhotosUploader({ addedPhotos, onChange }) {
         onChange([filename, ...addedPhotos.filter(photo => photo !== filename)]);
     }
 
-    const baseUrl = import.meta.env.VITE_BASE_URL;
-
     return (
         <>
             <div className='flex gap-2'>
@@ -72,9 +70,8 @@ function PhotosUploader({ addedPhotos, onChange }) {
                     placeholder='Add using a link ....jpg'
                 />
                 <button onClick={addPhotoByLink} className='bg-gray-200 px-4 rounded-2xl' disabled={loading}>
-  {loading ? <AiOutlineLoading3Quarters className='h-5 w-5 animate-spin' /> : <>Add&nbsp;photo</>}
-</button>
-
+                    {loading ? <AiOutlineLoading3Quarters className='h-5 w-5 animate-spin' /> : <>Add&nbsp;photo</>}
+                </button>
             </div>
 
             <div className='mt-2 grid gap-2 grid-cols-3 md:grid-cols-4 lg:grid-cols-6'>
@@ -82,7 +79,7 @@ function PhotosUploader({ addedPhotos, onChange }) {
                     <div className='h-auto w-auto aspect-video flex relative' key={link}>
                         <img
                             className="rounded-2xl w-full object-cover"
-                            src={link.startsWith('http') ? link : `${baseUrl}/uploads/${link}`} // dynamically use base URL
+                            src={link} // Use the link directly
                             alt=""
                         />
                         <button onClick={ev => removePhoto(ev, link)} className="cursor-pointer absolute bottom-1 right-1 text-white bg-black opacity-50 rounded-2xl py-2 px-3">
