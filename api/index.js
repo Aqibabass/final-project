@@ -375,6 +375,6 @@ app.post('/google-login', async (req, res) => {
 });
 
 // Listen on the appropriate port
-app.listen(process.env.PORT || 5000, () => {
+app.listen(process.env.PORT || 4000, () => {
   console.log('Server is running');
 });
