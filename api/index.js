@@ -217,13 +217,16 @@ app.post('/places', (req, res) => {
 });
 
 // Retrieve user's places
-app.get('/user-places', (req, res) => {
-  const { token } = req.cookies;
-  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    const { id } = userData;
-    res.json(await Place.find({ owner: id }));
-  });
+app.get('/user-places', async (req, res) => {
+  try {
+    const userData = await getUserDataFromReq(req);
+    const places = await Place.find({ owner: userData.id });
+    res.json(places);
+  } catch (error) {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
 });
+
 
 // Get a specific place by ID
 app.get('/places/:id', async (req, res) => {
@@ -275,10 +278,14 @@ app.post('/bookings', async (req, res) => {
 
 // Get bookings for a user
 app.get('/bookings', async (req, res) => {
-  const userData = await getUserDataFromReq(req);
-  res.json(await Booking.find({ user: userData.id }).populate('place'));
+  try {
+    const userData = await getUserDataFromReq(req);
+    const bookings = await Booking.find({ user: userData.id }).populate('place');
+    res.json(bookings);
+  } catch (error) {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
 });
-
 // Cancel a booking
 app.delete('/bookings/:id', async (req, res) => {
   const { id } = req.params;
