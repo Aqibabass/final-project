@@ -20,7 +20,7 @@ function RegisterPage() {
     
     setLoading(true);
     try {
-      await axios.post('${import.meta.env.VITE_BASE_URL}/register', {
+      await axios.post('/register', {
         name,
         email,
         password,

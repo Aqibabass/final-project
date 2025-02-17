@@ -39,7 +39,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
   
 }));
-console.log("Frontend URL from .env:", process.env.FRONTEND_URL);
+
 mongoose.connect(process.env.MONGO_URL);
 
 app.get("/", (req, res) => {

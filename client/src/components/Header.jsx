@@ -12,7 +12,7 @@ function Header({ handleSearch }) {
 
   const logout = async () => {
     try {
-      await axios.post('${import.meta.env.VITE_BASE_URL}/logout');
+      await axios.post('/logout');
       setUser(null);
       navigate('/');
     } catch (err) {

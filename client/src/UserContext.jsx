@@ -8,7 +8,7 @@ export function UserContextProvider({ children }) {
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
-        axios.get('${import.meta.env.VITE_BASE_URL}/profile')
+        axios.get('/profile')
             .then(({ data }) => {
                 setUser(data);
                 setReady(true);

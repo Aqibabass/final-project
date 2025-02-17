@@ -14,7 +14,7 @@ function BookingPage() {
 
   useEffect(() => {
     if (id) {
-      axios.get('${import.meta.env.VITE_BASE_URL}/bookings').then(response => {
+      axios.get('/bookings').then(response => {
         const foundBooking = response.data.find(({ _id }) => _id === id);
         if (foundBooking) {
           setBooking(foundBooking);
@@ -25,7 +25,7 @@ function BookingPage() {
 
   const cancelBooking = async () => {
     try {
-      await axios.delete(`${import.meta.env.VITE_BASE_URL}/bookings/${id}`);
+      await axios.delete(`/bookings/${id}`);
       navigate('/account/bookings');
     } catch (error) {
       console.error('Error canceling booking:', error);
