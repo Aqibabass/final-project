@@ -28,27 +28,20 @@ cloudinary.config({
 app.use(express.json());
 app.use(cookieParser());
 
-const corsOptions = {
-  origin: process.env.FRONTEND_URL, // e.g., "https://final-project-mu-nine.vercel.app"
-  credentials: true, // Allow credentials (cookies)
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-};
 
-app.use(cors(corsOptions));
-
-// Handle preflight requests
-app.options('*', cors(corsOptions));
+app.use(cors({
+  credentials: true,
+  origin: [
+   
+    process.env.FRONTEND_URL
+  ]
+  
+}));
 
 mongoose.connect(process.env.MONGO_URL);
 
 app.get("/", (req, res) => {
   res.send("Server is running!");
-});
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
-  next();
 });
 
 // Function to get user data from request
@@ -332,35 +325,57 @@ app.delete('/places/:id', async (req, res) => {
 });
 
 // Google login integration
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 app.post('/google-login', async (req, res) => {
   const { token } = req.body;
-
-  const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: process.env.GOOGLE_CLIENT_ID
     });
 
-    const { name, email, picture } = ticket.getPayload();
+    const payload = ticket.getPayload();
+    const { sub: googleId, name, email, picture } = payload;
 
-    const userDoc = await User.findOne({ email });
+    let user = await User.findOne({
+      $or: [
+        { googleId },
+        { email }
+      ]
+    });
 
-    if (!userDoc) {
-      const newUser = await User.create({ name, email, avatar: picture });
-      const jwtToken = jwt.sign({ email: newUser.email, id: newUser._id }, jwtSecret);
-      res.cookie('token', jwtToken, { httpOnly: true }).json(newUser);
-    } else {
-      const jwtToken = jwt.sign({ email: userDoc.email, id: userDoc._id }, jwtSecret);
-      res.cookie('token', jwtToken, { httpOnly: true }).json(userDoc);
+    if (!user) {
+      user = await User.create({
+        googleId,
+        name,
+        email,
+        avatar: picture
+      });
     }
+
+    jwt.sign(
+      { email: user.email, id: user._id },
+      jwtSecret,
+      {},
+      (err, token) => {
+        if (err) throw err;
+        res.cookie('token', token, { httpOnly: true }).json({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar
+        });
+      }
+    );
   } catch (error) {
-    console.error('Error during Google login:', error);
+    console.error('Google login error:', error);
     res.status(500).json({ message: 'Error during Google login' });
   }
 });
 
-app.listen(4000, () => {
-  console.log('Server running on http://localhost:5000');
+// Listen on the appropriate port
+app.listen(process.env.PORT || 4000, () => {
+  console.log('Server is running');
 });
