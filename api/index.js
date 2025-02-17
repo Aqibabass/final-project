@@ -28,24 +28,22 @@ cloudinary.config({
 app.use(express.json());
 app.use(cookieParser());
 
-
+// Handle CORS dynamically based on environment
 app.use(cors({
   credentials: true,
   origin: [
-   
-    process.env.FRONTEND_URL
+    process.env.FRONTEND_URL || 'http://localhost:5173', // Allow localhost for development and set frontend URL for production
   ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-  
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-console.log("Frontend URL from .env:", process.env.FRONTEND_URL);
 mongoose.connect(process.env.MONGO_URL);
 
 app.get("/", (req, res) => {
   res.send("Server is running!");
 });
 
+// Function to get user data from request
 function getUserDataFromReq(req) {
   return new Promise((resolve, reject) => {
     jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
@@ -75,6 +73,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// Login route with JWT authentication
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -104,6 +103,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Profile route
 app.get('/profile', async (req, res) => {
   const { token } = req.cookies;
   if (token) {
@@ -117,10 +117,12 @@ app.get('/profile', async (req, res) => {
   }
 });
 
+// Logout route
 app.post('/logout', (req, res) => {
   res.cookie('token', '').json(true);
 });
 
+// Image upload via URL
 app.post('/upload-by-link', async (req, res) => {
   const { link } = req.body;
 
@@ -155,6 +157,7 @@ app.post('/upload-by-link', async (req, res) => {
   }
 });
 
+// File upload route (multiple files)
 const photosMiddleware = multer();
 
 app.post('/upload', photosMiddleware.array('photos', 100), async (req, res) => {
@@ -186,6 +189,7 @@ app.post('/upload', photosMiddleware.array('photos', 100), async (req, res) => {
   }
 });
 
+// Routes for creating and managing places
 app.post('/places', (req, res) => {
   const { token } = req.cookies;
   const { title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price } = req.body;
@@ -199,6 +203,7 @@ app.post('/places', (req, res) => {
   });
 });
 
+// Retrieve user's places
 app.get('/user-places', (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
@@ -207,6 +212,7 @@ app.get('/user-places', (req, res) => {
   });
 });
 
+// Get a specific place by ID
 app.get('/places/:id', async (req, res) => {
   const { id } = req.params;
   const place = await Place.findById(id).populate('owner', 'name');
@@ -216,6 +222,7 @@ app.get('/places/:id', async (req, res) => {
   res.json(place);
 });
 
+// Update place information
 app.put('/places', async (req, res) => {
   const { token } = req.cookies;
   const { id, title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price } = req.body;
@@ -234,10 +241,12 @@ app.put('/places', async (req, res) => {
   });
 });
 
+// Fetch all places
 app.get('/places', async (req, res) => {
   res.json(await Place.find());
 });
 
+// Booking routes
 app.post('/bookings', async (req, res) => {
   const userData = await getUserDataFromReq(req);
   const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body;
@@ -251,11 +260,13 @@ app.post('/bookings', async (req, res) => {
   });
 });
 
+// Get bookings for a user
 app.get('/bookings', async (req, res) => {
   const userData = await getUserDataFromReq(req);
   res.json(await Booking.find({ user: userData.id }).populate('place'));
 });
 
+// Cancel a booking
 app.delete('/bookings/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -271,6 +282,7 @@ app.delete('/bookings/:id', async (req, res) => {
   }
 });
 
+// Profile update
 app.put('/update-profile', async (req, res) => {
   const { token } = req.cookies;
   const { username, password } = req.body;
@@ -295,6 +307,7 @@ app.put('/update-profile', async (req, res) => {
   });
 });
 
+// Delete a place
 app.delete('/places/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -310,6 +323,7 @@ app.delete('/places/:id', async (req, res) => {
   }
 });
 
+// Google login integration
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 app.post('/google-login', async (req, res) => {
@@ -356,10 +370,11 @@ app.post('/google-login', async (req, res) => {
     );
   } catch (error) {
     console.error('Google login error:', error);
-    res.status(400).json({ message: 'Google login failed' });
+    res.status(500).json({ message: 'Error during Google login' });
   }
 });
 
-app.listen(4000, () => {
-  console.log('Server is running on port 4000');
+// Listen on the appropriate port
+app.listen(process.env.PORT || 5000, () => {
+  console.log('Server is running');
 });

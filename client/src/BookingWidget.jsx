@@ -29,21 +29,18 @@ function BookingWidget({ place }) {
     };
 
     const bookThisPlace = async () => {
-        // Validate form before checking login status
         if (!isFormValid()) {
             alert('Please fill all fields!');
             return;
         }
 
-        // Check login status
         if (!user) {
             alert('Please login to book a place!');
             return;
         }
 
-        // If all checks pass, proceed to book the place
         try {
-            const response = await axios.post('/bookings', {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/bookings`, {
                 checkIn,
                 checkOut,
                 numberOfGuests,
@@ -95,21 +92,18 @@ function BookingWidget({ place }) {
                         />
                     </div>
                     <div className='my-4 py-3 px-4 border-t'>
-                            <label>Number of guests:</label>
-                            <input
-                                type="number"
-                                value={numberOfGuests}
-                                onChange={ev => setNumberOfGuests(Number(ev.target.value))}
-                                min={1}
-                            />
-                        </div>
+                        <label>Number of guests:</label>
+                        <input
+                            type="number"
+                            value={numberOfGuests}
+                            onChange={ev => setNumberOfGuests(Number(ev.target.value))}
+                            min={1}
+                        />
+                    </div>
                 </div>
 
-                
                 {checkIn && checkOut && (
                     <>
-                       
-
                         {numberOfNights > 0 && (
                             <div className='my-4 py-3 px-4 border-t'>
                                 <label>Your Name:</label>
