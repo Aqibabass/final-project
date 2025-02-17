@@ -45,8 +45,11 @@ app.get("/", (req, res) => {
 // Function to get user data from request
 function getUserDataFromReq(req) {
   return new Promise((resolve, reject) => {
-    jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
-      if (err) throw err;
+    const token = req.cookies.token;
+    if (!token) return reject('No token provided');
+
+    jwt.verify(token, jwtSecret, {}, (err, userData) => {
+      if (err) return reject('Invalid token');
       resolve(userData);
     });
   });
@@ -93,7 +96,13 @@ app.post('/login', async (req, res) => {
       {},
       (err, token) => {
         if (err) throw err;
-        res.cookie('token', token, { httpOnly: true }).json(userDoc);
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: true, // Required for HTTPS
+          sameSite: 'none', // Allow cross-site cookies
+          path: '/', // Accessible across all paths
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        }).json(userDoc);
       }
     );
   } catch (error) {
@@ -102,23 +111,28 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Profile route
 app.get('/profile', async (req, res) => {
   const { token } = req.cookies;
-  if (token) {
-    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-      if (err) throw err;
-      const { name, email, _id, avatar } = await User.findById(userData.id);
-      res.json({ name, email, _id, avatar });
-    });
-  } else {
-    res.json(null);
+  if (!token) return res.json(null);
+
+  try {
+    const userData = await getUserDataFromReq(req);
+    const { name, email, _id, avatar } = await User.findById(userData.id);
+    res.json({ name, email, _id, avatar });
+  } catch (error) {
+    res.status(401).json({ error: 'Unauthorized' });
   }
 });
 
 // Logout route
 app.post('/logout', (req, res) => {
-  res.cookie('token', '').json(true);
+  res.cookie('token', '', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    path: '/',
+    expires: new Date(0), // Expire immediately
+  }).json(true);
 });
 
 // Image upload via URL
@@ -359,7 +373,13 @@ app.post('/google-login', async (req, res) => {
       {},
       (err, token) => {
         if (err) throw err;
-        res.cookie('token', token, { httpOnly: true }).json({
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          path: '/',
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        }).json({
           _id: user._id,
           name: user.name,
           email: user.email,
