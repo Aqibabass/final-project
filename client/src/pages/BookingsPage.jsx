@@ -13,8 +13,7 @@ function BookingsPage() {
     const fetchBookings = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('/bookings');
-        setBookings(response.data);
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/bookings`);        setBookings(response.data);
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -27,7 +26,7 @@ function BookingsPage() {
   const cancelBooking = async (id) => {
     try {
       setBookings(prevBookings => prevBookings.filter(booking => booking._id !== id));
-      await axios.delete(`/bookings/${id}`);
+      await axios.delete(`${import.meta.env.VITE_BASE_URL}/bookings/${id}`);
     } catch (error) {
       setBookings(prevBookings => [...prevBookings, { _id: id }]);
     }

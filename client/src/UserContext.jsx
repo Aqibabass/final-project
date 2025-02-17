@@ -1,19 +1,6 @@
 import axios from "axios";
 import { useEffect, createContext, useState } from "react";
 
-// Function to get user data from request
-function getUserDataFromReq(req) {
-    return new Promise((resolve, reject) => {
-      jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
-        if (err) {
-          reject(err); // Properly handle the error by calling reject
-        } else {
-          resolve(userData);
-        }
-      });
-    });
-  }
-
 export const UserContext = createContext({});
 
 export function UserContextProvider({ children }) {
@@ -21,18 +8,14 @@ export function UserContextProvider({ children }) {
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/profile`);
-                setUser(response.data);
+        axios.get('/profile')
+            .then(({ data }) => {
+                setUser(data);
                 setReady(true);
-            } catch (error) {
-                console.error('Error fetching profile:', error);
+            })
+            .catch(() => {
                 setReady(true);
-            }
-        };
-
-        fetchProfile();
+            });
     }, []);
 
     const updateUser = (userData) => {

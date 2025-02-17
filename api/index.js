@@ -31,13 +31,9 @@ app.use(cookieParser());
 
 app.use(cors({
   credentials: true,
-  origin: [
-   
-    process.env.FRONTEND_URL
-  ],
+  origin: process.env.FRONTEND_URL,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-  
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
 
 mongoose.connect(process.env.MONGO_URL);
@@ -76,7 +72,6 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Login route with JWT authentication
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -96,8 +91,18 @@ app.post('/login', async (req, res) => {
       jwtSecret,
       {},
       (err, token) => {
-        if (err) throw err;
-        res.cookie('token', token, { httpOnly: true }).json(userDoc);
+        if (err) {
+          console.error('Error generating JWT:', err);
+          return res.status(500).json({ message: 'Error generating token' });
+        }
+
+        // Set the cookie with secure, cross-origin settings
+        res.cookie('token', token, {
+          httpOnly: true, // Prevents client-side JS from accessing the cookie
+          secure: true, // Ensures the cookie is only sent over HTTPS
+          sameSite: 'none', // Allows cross-origin requests
+          maxAge: 7 * 24 * 60 * 60 * 1000, // Optional: Set cookie expiration (e.g., 7 days)
+        }).json(userDoc); // Send the user data in the response
       }
     );
   } catch (error) {
@@ -265,8 +270,14 @@ app.post('/bookings', async (req, res) => {
 
 // Get bookings for a user
 app.get('/bookings', async (req, res) => {
-  const userData = await getUserDataFromReq(req);
-  res.json(await Booking.find({ user: userData.id }).populate('place'));
+  try {
+    const userData = await getUserDataFromReq(req);
+    const bookings = await Booking.find({ user: userData.id }).populate('place');
+    res.json(bookings);
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    res.status(401).json({ error: 'Unauthorized or invalid token' });
+  }
 });
 
 // Cancel a booking
@@ -288,7 +299,7 @@ app.delete('/bookings/:id', async (req, res) => {
 // Profile update
 app.put('/update-profile', async (req, res) => {
   const { token } = req.cookies;
-  const { username, password } = req.body;
+  const { name, password } = req.body; 
 
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     if (err) {
@@ -300,7 +311,7 @@ app.put('/update-profile', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.name = username || user.name;
+    user.name = name || user.name;
     if (password) {
       user.password = bcrypt.hashSync(password, bcryptSalt);
     }
