@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "proxy": "https://final-project-backend-kappa.vercel.app/",
+  "proxy": "https://final-project-backend-kappa.vercel.app",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
