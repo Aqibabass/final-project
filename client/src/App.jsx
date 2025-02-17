@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route} from "react-router-dom";
 import IndexPage from "./pages/IndexPage";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./Layout";
@@ -25,19 +25,7 @@ axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 axios.defaults.withCredentials = true;
 
 function App() {
-  const location = useLocation();
-
-  React.useEffect(() => {
-    if (
-      location.pathname.startsWith("/create-trip") ||
-      location.pathname.startsWith("/view-trip") ||
-      location.pathname.startsWith("/my-trips")
-    ) {
-      axios.defaults.withCredentials = false;
-    } else {
-      axios.defaults.withCredentials = true;
-    }
-  }, [location]);
+ 
 
   return (
     <UserContextProvider>

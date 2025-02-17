@@ -101,15 +101,16 @@ function CreateTrip() {
                                 What is your destination of choice?
                             </h2>
                             <GooglePlacesAutocomplete 
-                                apiKey={import.meta.env.VITE_GOOGLE_PLACE_API_KEY}
-                                selectProps={{
-                                    place,
-                                    onChange: (v) => {
-                                        setPlace(v);
-                                        handleInputChange('location', v);
-                                    }
-                                }}
-                            />
+  apiKey={import.meta.env.VITE_GOOGLE_PLACE_API_KEY}
+  selectProps={{
+    place,
+    onChange: (v) => {
+      setPlace(v);
+      handleInputChange('location', v);
+    }
+  }}
+  fetchOptions={{ credentials: 'omit' }} 
+/>
                         </div>
                         <div className='flex-1'>
                             <h2 className='text-xl my-3 font-medium'>
