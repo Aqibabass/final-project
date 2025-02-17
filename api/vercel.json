@@ -14,29 +14,10 @@
     {
       "src": "/(.*)",
       "dest": "/",
-      "methods": [
-        "GET",
-        "POST",
-        "PUT",
-        "DELETE",
-        "PATCH",
-        "OPTIONS",
-        "HEAD"
-      ],
-      "headers": [
-        {
-          "source": "/(.*)",
-          "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Origin", "value": "https://your-frontend.vercel.app" }
-      ]
-    }
-  ]
-        }
-      ]
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+      "headers": {
+        "Access-Control-Allow-Origin": "https://final-project-mu-nine.vercel.app"
+      }
     }
   ]
 }
