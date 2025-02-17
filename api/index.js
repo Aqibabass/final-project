@@ -31,13 +31,14 @@ app.use(cookieParser());
 
 app.use(cors({
   credentials: true,
-  origin: process.env.FRONTEND_URL, // Ensure this matches your frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  origin: [
+   
+    process.env.FRONTEND_URL
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+  
 }));
-
-// Handle preflight requests
-app.options('*', cors());
 
 mongoose.connect(process.env.MONGO_URL);
 
@@ -45,13 +46,11 @@ app.get("/", (req, res) => {
   res.send("Server is running!");
 });
 
+// Function to get user data from request
 function getUserDataFromReq(req) {
   return new Promise((resolve, reject) => {
-    jwt.verify(req.cookies.token, process.env.JWT_SECRET, {}, (err, userData) => {
-      if (err) {
-        console.error('JWT Error:', err);
-        reject('Invalid token');
-      }
+    jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
+      if (err) throw err;
       resolve(userData);
     });
   });
@@ -71,33 +70,13 @@ app.post('/register', async (req, res) => {
       password: bcrypt.hashSync(password, bcryptSalt),
     });
 
-    // Generate JWT token for the new user
-    jwt.sign(
-      { email: userDoc.email, id: userDoc._id },
-      process.env.JWT_SECRET,
-      {},
-      (err, token) => {
-        if (err) {
-          console.error('Error generating JWT:', err);
-          return res.status(500).json({ message: 'Error generating token' });
-        }
-
-        // Set the cookie with secure, cross-origin settings
-        res.cookie('token', token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          domain: '.vercel.app',
-          path: '/',
-          maxAge: 7 * 24 * 60 * 60 * 1000, // Optional: Set cookie expiration (e.g., 7 days)
-        }).json(userDoc); // Send the user data in the response
-      }
-    );
+    res.json(userDoc);
   } catch (e) {
     res.status(422).json(e);
   }
 });
 
+// Login route with JWT authentication
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -114,23 +93,11 @@ app.post('/login', async (req, res) => {
 
     jwt.sign(
       { email: userDoc.email, id: userDoc._id },
-      process.env.JWT_SECRET,
+      jwtSecret,
       {},
       (err, token) => {
-        if (err) {
-          console.error('Error generating JWT:', err);
-          return res.status(500).json({ message: 'Error generating token' });
-        }
-
-        // Set the cookie with secure, cross-origin settings
-        res.cookie('token', token, {
-          httpOnly: true, // Prevents client-side JS from accessing the cookie
-          secure: true, // Ensures the cookie is only sent over HTTPS
-          sameSite: 'none', // Allows cross-origin requests
-          domain: '.vercel.app', // Allow cookies across all Vercel subdomains
-          path: '/', // Make the cookie available site-wide
-          maxAge: 7 * 24 * 60 * 60 * 1000, // Optional: Set cookie expiration (e.g., 7 days)
-        }).json(userDoc); // Send the user data in the response
+        if (err) throw err;
+        res.cookie('token', token, { httpOnly: true }).json(userDoc);
       }
     );
   } catch (error) {
@@ -139,6 +106,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Profile route
 app.get('/profile', async (req, res) => {
   const { token } = req.cookies;
   if (token) {
@@ -154,15 +122,9 @@ app.get('/profile', async (req, res) => {
 
 // Logout route
 app.post('/logout', (req, res) => {
-  res.cookie('token', '', {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-    domain: '.vercel.app',
-    path: '/',
-    expires: new Date(0), // Expire the cookie immediately
-  }).json({ message: 'Logged out successfully' });
+  res.cookie('token', '').json(true);
 });
+
 // Image upload via URL
 app.post('/upload-by-link', async (req, res) => {
   const { link } = req.body;
@@ -303,14 +265,8 @@ app.post('/bookings', async (req, res) => {
 
 // Get bookings for a user
 app.get('/bookings', async (req, res) => {
-  try {
-    const userData = await getUserDataFromReq(req);
-    const bookings = await Booking.find({ user: userData.id }).populate('place');
-    res.json(bookings);
-  } catch (error) {
-    console.error('Bookings Error:', error); // Check Vercel logs for this
-    res.status(500).json({ error: 'Failed to fetch bookings' });
-  }
+  const userData = await getUserDataFromReq(req);
+  res.json(await Booking.find({ user: userData.id }).populate('place'));
 });
 
 // Cancel a booking
@@ -332,7 +288,7 @@ app.delete('/bookings/:id', async (req, res) => {
 // Profile update
 app.put('/update-profile', async (req, res) => {
   const { token } = req.cookies;
-  const { name, password } = req.body; 
+  const { username, password } = req.body;
 
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     if (err) {
@@ -344,7 +300,7 @@ app.put('/update-profile', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.name = name || user.name;
+    user.name = username || user.name;
     if (password) {
       user.password = bcrypt.hashSync(password, bcryptSalt);
     }
@@ -379,14 +335,17 @@ app.post('/google-login', async (req, res) => {
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: process.env.GOOGLE_CLIENT_ID
     });
 
     const payload = ticket.getPayload();
     const { sub: googleId, name, email, picture } = payload;
 
     let user = await User.findOne({
-      $or: [{ googleId }, { email }],
+      $or: [
+        { googleId },
+        { email }
+      ]
     });
 
     if (!user) {
@@ -394,34 +353,21 @@ app.post('/google-login', async (req, res) => {
         googleId,
         name,
         email,
-        avatar: picture,
+        avatar: picture
       });
     }
 
-    // Generate JWT token for the Google-authenticated user
     jwt.sign(
       { email: user.email, id: user._id },
-      process.env.JWT_SECRET,
+      jwtSecret,
       {},
       (err, token) => {
-        if (err) {
-          console.error('Error generating JWT:', err);
-          return res.status(500).json({ message: 'Error generating token' });
-        }
-
-        // Set the cookie with secure, cross-origin settings
-        res.cookie('token', token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          domain: '.vercel.app',
-          path: '/',
-          maxAge: 7 * 24 * 60 * 60 * 1000, // Optional: Set cookie expiration (e.g., 7 days)
-        }).json({
+        if (err) throw err;
+        res.cookie('token', token, { httpOnly: true }).json({
           _id: user._id,
           name: user.name,
           email: user.email,
-          avatar: user.avatar,
+          avatar: user.avatar
         });
       }
     );
