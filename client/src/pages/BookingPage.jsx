@@ -10,25 +10,40 @@ import { FaRegTrashAlt } from 'react-icons/fa';
 function BookingPage() {
   const { id } = useParams();
   const [booking, setBooking] = useState(null);
+  const [loading, setLoading] = useState(true); // Adding loading state
+  const [error, setError] = useState(null); // Adding error state
   const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
-      axios.get('/bookings').then(response => {
-        const foundBooking = response.data.find(({ _id }) => _id === id);
-        if (foundBooking) {
-          setBooking(foundBooking);
-        }
-      });
+      axios.get(`${process.env.REACT_APP_API_URL}/bookings`) // Updated URL
+        .then(response => {
+          const foundBooking = response.data.find(({ _id }) => _id === id);
+          if (foundBooking) {
+            setBooking(foundBooking);
+          } else {
+            setError("Booking not found.");
+          }
+        })
+        .catch((err) => {
+          setError("Error fetching booking.");
+          console.error("Error:", err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   }, [id]);
 
   const cancelBooking = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to cancel this booking?");
+    if (!confirmDelete) return; // If the user cancels, return early
     try {
-      await axios.delete(`/bookings/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/bookings/${id}`); // Updated URL
       navigate('/account/bookings');
     } catch (error) {
       console.error('Error canceling booking:', error);
+      alert("Error canceling booking.");
     }
   };
 
@@ -36,12 +51,16 @@ function BookingPage() {
     navigate('/account/bookings');
   };
 
-  if (!booking) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 
+  if (error) {
+    return <div>{error}</div>;
+  }
+
   return (
-    <div className=' mt-8 mb-8'>
+    <div className='mt-8 mb-8'>
       <h1 className='text-3xl sm:text-2xl'>{booking.place.title}</h1>
       <AddressLink className='text-sm sm:text-base'>
         {booking.place.address}
@@ -63,6 +82,7 @@ function BookingPage() {
           <button
             onClick={cancelBooking}
             className="text-red-500 justify-around bg-transparent hover:text-red-800"
+            aria-label="Cancel booking"
           >
             <FaRegTrashAlt className='size-7' />
           </button>
@@ -70,6 +90,7 @@ function BookingPage() {
           <button
             onClick={handleBackButtonClick}
             className="justify-around bg-transparent hover:text-primary"
+            aria-label="Back to bookings"
           >
             <TiArrowBackOutline className='size-7' />
           </button>
@@ -78,7 +99,6 @@ function BookingPage() {
 
       <PlaceGallery place={booking.place} />
     </div>
-
   );
 }
 

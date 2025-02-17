@@ -1,7 +1,7 @@
 import { UserContext } from '@/UserContext';
 import axios from 'axios';
 import React, { useState, useContext } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { FcGoogle } from 'react-icons/fc';
 
@@ -26,7 +26,7 @@ function LoginPage() {
     setError('');
 
     try {
-      const { data } = await axios.post('/login', { email, password });
+      const { data } = await axios.post(`${process.env.REACT_APP_API_URL}/login`, { email, password }); // Updated URL
       setUser(data);
       setIsLoggedIn(true); // Update login status
       alert('Login successful');
@@ -40,8 +40,8 @@ function LoginPage() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const response = await axios.post('/google-login', {
-        token: credentialResponse.credential
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/google-login`, {
+        token: credentialResponse.credential // Updated URL
       });
       setUser(response.data);
       setIsLoggedIn(true); 

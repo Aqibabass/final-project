@@ -20,7 +20,8 @@ function RegisterPage() {
     
     setLoading(true);
     try {
-      await axios.post('/register', {
+      // Use the environment variable for the API URL
+      await axios.post(`${process.env.REACT_APP_API_URL}/register`, {
         name,
         email,
         password,
