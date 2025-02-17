@@ -12,9 +12,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true, 
-    proxy: {
-      '/api': process.env.VITE_BASE_URL ||'http://localhost:4000',
-    },
+   
   },
   plugins: [react()]
 });

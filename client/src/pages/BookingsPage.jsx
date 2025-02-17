@@ -13,7 +13,7 @@ function BookingsPage() {
     const fetchBookings = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/bookings`); // Corrected URL
+        const response = await axios.get('/bookings');
         setBookings(response.data);
         setLoading(false);
       } catch (error) {
@@ -27,7 +27,7 @@ function BookingsPage() {
   const cancelBooking = async (id) => {
     try {
       setBookings(prevBookings => prevBookings.filter(booking => booking._id !== id));
-      await axios.delete(`${import.meta.env.VITE_BASE_URL}/bookings/${id}`); // Corrected URL
+      await axios.delete(`/bookings/${id}`);
     } catch (error) {
       setBookings(prevBookings => [...prevBookings, { _id: id }]);
     }
@@ -41,6 +41,7 @@ function BookingsPage() {
           <div>Loading...</div>
         ) : bookings.length === 0 ? (
           <div className="items-center text-xl font-bold mb-4">No bookings available</div>
+          
         ) : (
           bookings.map(booking => (
             <Link
