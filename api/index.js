@@ -29,14 +29,17 @@ app.use(express.json());
 app.use(cookieParser());
 
 
-app.use(cors({
-  credentials: true,
-  origin: [
-   
-    process.env.FRONTEND_URL
-  ]
-  
-}));
+const corsOptions = {
+  origin: process.env.FRONTEND_URL, // e.g., "https://final-project-mu-nine.vercel.app"
+  credentials: true, // Allow credentials (cookies)
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 mongoose.connect(process.env.MONGO_URL);
 
