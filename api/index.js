@@ -30,12 +30,10 @@ app.use(cookieParser());
 
 
 app.use(cors({
+  origin: process.env.FRONTEND_URL, 
   credentials: true,
-  origin: [
-   
-    process.env.FRONTEND_URL
-  ]
-  
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 mongoose.connect(process.env.MONGO_URL);
