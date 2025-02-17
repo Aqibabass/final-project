@@ -40,7 +40,7 @@ function BookingWidget({ place }) {
         }
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/bookings`, {
+            const response = await axios.post(`https://final-project-mu-nine.vercel.app/bookings`, {
                 checkIn,
                 checkOut,
                 numberOfGuests,
