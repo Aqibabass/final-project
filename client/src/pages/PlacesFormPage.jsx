@@ -2,7 +2,8 @@ import AccountNav from '@/AccountNav';
 import Perks from '@/Perks';
 import PhotosUploader from '@/PhotosUploader';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react'
+import { useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 
 function PlacesFormPage() {
@@ -18,13 +19,13 @@ function PlacesFormPage() {
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
     const [maxGuests, setMaxGuests] = useState(1);
-    const [price, setPrice] = useState(100);
+    const [price,setPrice]= useState(100);
     const [redirect, setRedirect] = useState(false);
 
     useEffect(() => {
         if (!id) return;
 
-        axios.get(`${import.meta.env.VITE_BASE_URL}/places/` + id).then(response => {
+        axios.get('/places/' + id).then(response => {
             const { data } = response;
             setTitle(data.title);
             setAddress(data.address);
@@ -66,14 +67,13 @@ function PlacesFormPage() {
 
         if (id) {
             // Update the place
-            await axios.put(`${import.meta.env.VITE_BASE_URL}/places`, {
-                id, ...placeData
-            });
-            setRedirect(true);
+            await axios.put('/places' , {
+                id, ...placeData}); 
+            setRedirect(true); 
         } else {
             // Create a new place
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/places`, placeData);
-            setRedirect(true);
+            await axios.post('/places', placeData); 
+            setRedirect(true); 
         }
     }
 
@@ -86,22 +86,23 @@ function PlacesFormPage() {
             <AccountNav />
             <form onSubmit={savePlace}>
                 {preInput('Title', 'Provide a catchy title for your place, like an advertisement.')}
-                <input
-                    type='text'
-                    value={title}
-                    onChange={ev => setTitle(ev.target.value)}
-                    placeholder='Title, for example: My lovely apt'
+                <input 
+                    type='text' 
+                    value={title} 
+                    onChange={ev => setTitle(ev.target.value)} 
+                    placeholder='Title, for example: My lovely apt' 
                 />
 
                 {preInput('Address', 'Enter the address of this place.')}
-                <input
-                    type='text'
-                    value={address}
-                    onChange={ev => setAddress(ev.target.value)}
-                    placeholder='Address'
+                <input 
+                    type='text' 
+                    value={address} 
+                    onChange={ev => setAddress(ev.target.value)} 
+                    placeholder='Address' 
                 />
 
                 {preInput('Photos', 'Add multiple photos to showcase your place better.')}
+                
                 <PhotosUploader addedPhotos={addedPhotos} onChange={setAddedPhotos} />
 
                 {preInput('Description', 'Provide a detailed description of the place.')}
@@ -119,38 +120,38 @@ function PlacesFormPage() {
                 <div className='grid gap-2 grid-cols-2 md:grid-cols-4'>
                     <div>
                         <h3 className='mt-2 -mb-1'>Check-in time</h3>
-                        <input
-                            type="text"
-                            value={checkIn}
-                            onChange={ev => setCheckIn(ev.target.value)}
-                            placeholder='14'
+                        <input 
+                            type="text" 
+                            value={checkIn} 
+                            onChange={ev => setCheckIn(ev.target.value)} 
+                            placeholder='14' 
                         />
                     </div>
 
                     <div>
                         <h3 className='mt-2 -mb-1'>Check-out time</h3>
-                        <input
-                            type="text"
-                            value={checkOut}
-                            onChange={ev => setCheckOut(ev.target.value)}
-                            placeholder='11'
+                        <input 
+                            type="text" 
+                            value={checkOut} 
+                            onChange={ev => setCheckOut(ev.target.value)} 
+                            placeholder='11' 
                         />
                     </div>
 
                     <div>
                         <h3 className='mt-2 -mb-1'>Max Number of Guests</h3>
-                        <input
-                            type="number"
-                            value={maxGuests}
-                            onChange={ev => setMaxGuests(ev.target.value)}
+                        <input 
+                            type="number" 
+                            value={maxGuests} 
+                            onChange={ev => setMaxGuests(ev.target.value)} 
                         />
                     </div>
                     <div>
                         <h3 className='mt-2 -mb-1'>Price per night</h3>
-                        <input
-                            type="number"
-                            value={price}
-                            onChange={ev => setPrice(ev.target.value)}
+                        <input 
+                            type="number" 
+                            value={price} 
+                            onChange={ev => setPrice(ev.target.value)} 
                         />
                     </div>
                 </div>

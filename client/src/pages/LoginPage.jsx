@@ -26,7 +26,7 @@ function LoginPage() {
     setError('');
 
     try {
-      const { data } = await axios.post('${import.meta.env.VITE_BASE_URL}/login', { email, password });
+      const { data } = await axios.post('/login', { email, password });
       setUser(data);
       setIsLoggedIn(true); // Update login status
       alert('Login successful');

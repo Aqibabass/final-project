@@ -4,6 +4,7 @@ import PlaceGallery from '@/PlaceGallery';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+
 import { FaWifi, FaParking, FaTv, FaPaw } from 'react-icons/fa';
 import { HiOutlineRadio } from "react-icons/hi2";
 import { MdAcUnit, MdLock } from 'react-icons/md';
@@ -15,14 +16,15 @@ function PlacePage() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      return;
+    }
 
-    axios.get(`${import.meta.env.VITE_BASE_URL}/places/${id}`)
-      .then((response) => setPlace(response.data))
-      .catch((error) => {
-        console.error('Error fetching place:', error);
-        // Handle error: you can show an error message to the user
-      });
+    axios.get('/places/' + id).then((response) => {
+      setPlace(response.data);
+    }).catch((error) => {
+      console.error('Error fetching place:', error);
+    });
   }, [id]);
 
   if (!place) return <div>Loading...</div>;
@@ -31,17 +33,6 @@ function PlacePage() {
 
   const descriptionText = place.description;
   const shortenedDescription = descriptionText.length > 630 ? descriptionText.slice(0, 630) + '...' : descriptionText;
-
-  const perksIcons = {
-    wifi: <FaWifi className="w-5 h-5" />,
-    parking: <FaParking className="w-5 h-5" />,
-    tv: <FaTv className="w-5 h-5" />,
-    pets: <FaPaw className="w-5 h-5" />,
-    ac: <MdAcUnit className="w-5 h-5" />,
-    home: <AiOutlineHome className="w-5 h-5" />,
-    radio: <HiOutlineRadio className="w-5 h-5" />,
-    entrance: <MdLock className="w-5 h-5" />
-  };
 
   return (
     <div className='mt-2 -mx-8 px-8 pt-4'>
@@ -72,7 +63,15 @@ function PlacePage() {
             <ul className="list-none py-6">
               {place.perks.map((perk, index) => (
                 <li key={index} className="flex text-gray-600 text-xl items-center gap-3">
-                  {perksIcons[perk]} {perk.charAt(0).toUpperCase() + perk.slice(1)}
+                  {perk === 'wifi' && <FaWifi className="w-5 h-5" />}
+                  {perk === 'parking' && <FaParking className="w-5 h-5" />}
+                  {perk === 'tv' && <FaTv className="w-5 h-5" />}
+                  {perk === 'pets' && <FaPaw className="w-5 h-5" />}
+                  {perk === 'ac' && <MdAcUnit className="w-5 h-5" />}
+                  {perk === 'home' && <AiOutlineHome className="w-5 h-5" />}
+                  {perk === 'radio' && <HiOutlineRadio className="w-5 h-5" />}
+                  {perk === 'entrance' && <MdLock className="w-5 h-5" />}
+                  {perk.charAt(0).toUpperCase() + perk.slice(1)}
                 </li>
               ))}
             </ul>
