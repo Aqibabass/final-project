@@ -1,5 +1,4 @@
 {
-  "installCommand": "npm install --legacy-peer-deps",
   "version": 2,
   "builds": [
     {
@@ -14,7 +13,11 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/"
+      "dest": "/",
+      "Methods": ["GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD"]  ,
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
     }
   ]
 }

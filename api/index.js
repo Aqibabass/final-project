@@ -32,7 +32,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 app.use(cors({
   credentials: true,
   origin: [
-    'https://final-project-theta-plum.vercel.app',
+   
     process.env.FRONTEND_URL
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
