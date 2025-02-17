@@ -28,15 +28,18 @@ cloudinary.config({
 app.use(express.json());
 app.use(cookieParser());
 
-// Handle CORS dynamically based on environment
+
 app.use(cors({
   credentials: true,
   origin: [
-    process.env.FRONTEND_URL || 'http://localhost:5173', // Allow localhost for development and set frontend URL for production
+   
+    process.env.FRONTEND_URL
   ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+  
 }));
+
 mongoose.connect(process.env.MONGO_URL);
 
 app.get("/", (req, res) => {
