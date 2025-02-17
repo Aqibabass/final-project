@@ -34,16 +34,9 @@ app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:5173', // Allow localhost for development and set frontend URL for production
   ],
-<<<<<<< HEAD
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-=======
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-
->>>>>>> d87d89c01c07d2c8eaa7d1cb698945d0c62f7e95
 mongoose.connect(process.env.MONGO_URL);
 
 app.get("/", (req, res) => {
