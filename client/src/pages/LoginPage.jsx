@@ -26,7 +26,7 @@ function LoginPage() {
     setError('');
 
     try {
-      const { data } = await axios.post('/login', { email, password });
+      const { data } = await axios.post('${import.meta.env.VITE_BASE_URL}/login', { email, password });
       setUser(data);
       setIsLoggedIn(true); // Update login status
       alert('Login successful');
@@ -40,7 +40,7 @@ function LoginPage() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const response = await axios.post('/google-login', {
+      const response = await axios.post('${import.meta.env.VITE_BASE_URL}/google-login', {
         token: credentialResponse.credential
       });
       setUser(response.data);

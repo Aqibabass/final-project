@@ -16,7 +16,7 @@ function EditProfileForm({ user, setUser }) {
     e.preventDefault();
     setMessage('');
     try {
-      await axios.put('/update-profile', { username, password });
+      await axios.put('${import.meta.env.VITE_BASE_URL}/update-profile', { username, password });
       setUser((prev) => ({ ...prev, name: username }));
       setMessage('Profile updated successfully!');
     } catch (error) {

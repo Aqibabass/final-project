@@ -25,7 +25,7 @@ function PlacesFormPage() {
     useEffect(() => {
         if (!id) return;
 
-        axios.get('/places/' + id).then(response => {
+        axios.get('${import.meta.env.VITE_BASE_URL}/places/' + id).then(response => {
             const { data } = response;
             setTitle(data.title);
             setAddress(data.address);
@@ -67,12 +67,12 @@ function PlacesFormPage() {
 
         if (id) {
             // Update the place
-            await axios.put('/places' , {
+            await axios.put('${import.meta.env.VITE_BASE_URL}/places' , {
                 id, ...placeData}); 
             setRedirect(true); 
         } else {
             // Create a new place
-            await axios.post('/places', placeData); 
+            await axios.post('${import.meta.env.VITE_BASE_URL}/places', placeData); 
             setRedirect(true); 
         }
     }

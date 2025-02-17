@@ -13,7 +13,7 @@ function BookingsPage() {
     const fetchBookings = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('/bookings');
+        const response = await axios.get('${import.meta.env.VITE_BASE_URL}/bookings');
         setBookings(response.data);
         setLoading(false);
       } catch (error) {

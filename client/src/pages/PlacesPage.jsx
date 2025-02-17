@@ -11,7 +11,7 @@ function PlacesPage() {
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        const { data } = await axios.get('/user-places');
+        const { data } = await axios.get('${import.meta.env.VITE_BASE_URL}/user-places');
         setPlaces(data);
         setLoading(false);
       } catch (error) {
@@ -29,7 +29,7 @@ function PlacesPage() {
     e.preventDefault();  // Prevents the default behavior of the link
     
     try {
-      await axios.delete(`/places/${placeId}`); // DELETE request to your API
+      await axios.delete(`${import.meta.env.VITE_BASE_URL}/places/${placeId}`); // DELETE request to your API
       setPlaces(places.filter((place) => place._id !== placeId)); // Remove place from state
     } catch (error) {
       console.error('Error deleting place:', error);

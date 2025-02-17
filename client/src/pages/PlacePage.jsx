@@ -20,7 +20,7 @@ function PlacePage() {
       return;
     }
 
-    axios.get('/places/' + id).then((response) => {
+    axios.get('${import.meta.env.VITE_BASE_URL}/places/' + id).then((response) => {
       setPlace(response.data);
     }).catch((error) => {
       console.error('Error fetching place:', error);

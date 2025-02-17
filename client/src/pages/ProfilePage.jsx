@@ -18,14 +18,14 @@ function ProfilePage() {
   }
 
   async function logout() {
-    await axios.post('/logout');
+    await axios.post('${import.meta.env.VITE_BASE_URL}/logout');
     setRedirect('/');
     setUser(null);
   }
 
   async function handleUpdateProfile(updatedDetails) {
     try {
-      const response = await axios.put('/update-profile', updatedDetails);
+      const response = await axios.put('${import.meta.env.VITE_BASE_URL}/update-profile', updatedDetails);
       setUser((prev) => ({
         ...prev,
         name: updatedDetails.username,
