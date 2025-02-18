@@ -29,23 +29,26 @@ function Header({ handleSearch }) {
   }, [location]);
 
   return (
-    <div className="bg-white -mx-6 md:px-6 md:py-4 lg:px-7 lg:py-4 px-6 py-4">
+    <div className="bg-white -mx-6 md:px-6 md:py-4 lg:px-7 lg:py-4 px-4 py-4">
       <header className="flex w-auto justify-between items-center relative">
         <Link to={'/index'} className="flex items-center gap-1">
           <LuMapPinHouse className='size-7' />
-          <span className="font-bold text-xl hidden sm:block">TravelMate AI</span>
+          <span className={`font-bold text-xl ${location.pathname !== '/index' ? 'block' : 'hidden sm:block'}`}>
+  TravelMate AI
+</span>
+
         </Link>
 
         <div className="flex items-center gap-4">
           {location.pathname === '/index' && (
-            <div className="flex bg-transparent items-center gap-2 border border-gray-300 rounded-full py-1 px-4 shadow-md shadow-gray-300">
-              <input
+            <div className="flex bg-transparent items-center gap-2 border border-gray-300 rounded-full py-1 px-2 shadow-md shadow-gray-300 w-[180px] sm:w-[200px] md:w-52 lg:w-72">
+            <input
                 type="search"
-                placeholder="Search destinations"
-                className="flex-grow border-none focus:border-none bg-transparent outline-none text-sm placeholder-gray-500"
+                placeholder="Search Stay"
+                className=" px-2 flex-grow border-none bg-transparent outline-none text-xs sm:text-sm placeholder-gray-500 w-full"
                 onChange={(e) => handleSearch(e.target.value)}
               />
-              <button className="bg-primary items-center text-white p-2 rounded-full">
+              <button className="bg-primary mx-1 items-center text-white p-2 rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 512 512" className="w-4 h-4">
                   <path d="M456.69 421.39 362.6 327.3a173.81 173.81 0 0 0 34.84-104.58C397.44 126.38 319.06 48 222.72 
                   48S48 126.38 48 222.72s78.38 174.72 174.72 174.72A173.81 173.81 0 0 0 327.3 362.6l94.09 94.09a25 25 0 0 0

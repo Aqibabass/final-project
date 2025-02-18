@@ -69,7 +69,7 @@ function PlacesPage() {
             <Link
               key={place._id}
               to={`/account/places/${place._id}`} // Change to direct to the place page in account
-              className="flex flex-col sm:flex-row gap-4 bg-gray-100 p-4 rounded-2xl mb-4 hover:bg-gray-200 transition-all"
+              className="flex flex-col sm:flex-row gap-4 bg-gray-100 p-3 rounded-2xl mb-4 hover:bg-gray-200 transition-all"
             >
               <div className="flex aspect-video sm:w-60 bg-gray-300 grow-0 shrink-0 overflow-hidden rounded-xl">
                 <PlaceImg place={place} />

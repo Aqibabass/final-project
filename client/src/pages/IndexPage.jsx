@@ -39,8 +39,8 @@ function IndexPage() {
   return (
     <div>
       <Header places={places} setFilteredPlaces={setFilteredPlaces} handleSearch={handleSearch} />
-      <h2 className='font-bold text-3xl p-2  mt-6'>Find Your Perfect Stay</h2>
-      <div className="mt-6 mb-8 grid px-2 gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <h2 className='font-bold md:text-3xl md:px-2 px-1 py-2 text-2xl  mt-6'>Find Your Perfect Stay</h2>
+      <div className="mt-6 mb-8 grid px-1 md:px-2 gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         
         {loading ? (
           <div>Loading...</div>
