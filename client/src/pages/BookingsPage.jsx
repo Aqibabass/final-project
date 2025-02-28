@@ -47,7 +47,7 @@ function BookingsPage() {
             <Link
               key={booking._id}
               to={`/account/bookings/${booking._id}`}
-              className="flex flex-col sm:flex-row gap-4 bg-gray-100 p-4 rounded-2xl mb-4"
+              className="flex flex-col sm:flex-row gap-4 bg-gray-100 p-3 rounded-2xl mb-4"
             >
               <div className="flex aspect-video sm:w-60 bg-gray-300 grow-0 shrink-0 overflow-hidden rounded-xl">
                 <PlaceImg className="w-full h-full aspect-video object-cover" place={booking.place} />

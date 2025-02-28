@@ -36,12 +36,12 @@ function PlaceGallery({ place }) {
     return (
       <div className="fixed inset-0 bg-white z-50 flex flex-col overflow-hidden">
         <div className="flex justify-between items-center p-4 sm:p-6 border-b">
-          <h2 className="text-2xl sm:text-3xl text-black">Photos of {place.title}</h2>
+          <h2 className="text-2xl  sm:text-3xl text-black">Photos of {place.title}</h2>
           <button
             onClick={() => setShowAllPhotos(false)}
-            className="flex gap-1 py-2 px-4 rounded-2xl shadow-md shadow-gray-400 bg-red-500 text-white hover:bg-red-700 transition-all"
+            className="flex gap-1 py-2 px-4 rounded-2xl shadow-md shadow-gray-400 items-center bg-red-500 text-white hover:bg-red-700 transition-all"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w- h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
             <span className="text-sm sm:text-base">Close</span>
