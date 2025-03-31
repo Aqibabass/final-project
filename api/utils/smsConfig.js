@@ -9,13 +9,13 @@ const sendSMS = async (phone, message) => {
         console.log('Phone:', cleanPhone);
         console.log('Message:', message);
 
-       
         const params = {
             authorization: process.env.FAST2SMS_API_KEY,
             route: 'q', // Using quick transactional route
             numbers: cleanPhone,
             message: message,
-            language: 'english' 
+            language: 'english', // Setting language to English
+            unicode: 0 // Force non-Unicode encoding
         };
 
         console.log('Making API request to Fast2SMS...');

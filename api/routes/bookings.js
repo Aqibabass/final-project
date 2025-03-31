@@ -74,11 +74,22 @@ router.post('/', async (req, res) => {
         // Send SMS notification if enabled
         if (smsNotification && phone) {
             try {
-                const message = `Booking Confirmed! Your booking for ${booking.place.title} from ${new Date(checkIn).toLocaleDateString()} to ${new Date(checkOut).toLocaleDateString()} has been confirmed. Total amount paid: ₹${price}`;
-                await sendSMS(phone, message);
+                const formatDate = (date) => {
+                    const d = new Date(date);
+                    return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+                };
+        
+                const message = `Booking Confirmed! Your booking for ${booking.place.title} from ${formatDate(checkIn)} to ${formatDate(checkOut)} has been confirmed. Total amount paid: Rs.${price}`;
+                
+                // Set SMS options to ensure plain text
+                const smsOptions = {
+                    encoding: 'plain',
+                    unicode: false
+                };
+                
+                await sendSMS(phone, message, smsOptions);
             } catch (smsError) {
                 console.error("SMS sending failed:", smsError);
-               
             }
         }
 
