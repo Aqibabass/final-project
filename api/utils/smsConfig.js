@@ -14,7 +14,8 @@ const sendSMS = async (phone, message) => {
             authorization: process.env.FAST2SMS_API_KEY,
             route: 'q', // Using quick transactional route
             numbers: cleanPhone,
-            message: message
+            message: message,
+            language: 'english' 
         };
 
         console.log('Making API request to Fast2SMS...');
