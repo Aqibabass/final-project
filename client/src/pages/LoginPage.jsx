@@ -4,6 +4,7 @@ import React, { useState, useContext } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { FcGoogle } from 'react-icons/fc';
+import { RiLoader4Line } from 'react-icons/ri';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -79,7 +80,7 @@ function LoginPage() {
           )}
 
           <button className="primary" type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? <RiLoader4Line className="animate-spin mx-auto text-2xl" /> : 'Login'}
           </button>
           
           <div className="relative my-6">

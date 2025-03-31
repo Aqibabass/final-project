@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { RiLoader4Line } from 'react-icons/ri';
 
 function IndexPage() {
   const [places, setPlaces] = useState([]);
@@ -43,7 +44,7 @@ function IndexPage() {
       <div className="mt-6 mb-8 grid px-1 md:px-2 gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         
         {loading ? (
-          <div>Loading...</div>
+          <div className="fixed inset-0 flex items-center justify-center bg-white/60 z-10"><RiLoader4Line className="animate-spin text-6xl text-primary" /></div>
         ) : filteredPlaces.length > 0 ? (
           filteredPlaces.map(place => (
             <Link to={'/place/' + place._id} key={place._id}>

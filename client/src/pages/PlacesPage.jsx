@@ -3,6 +3,7 @@ import PlaceImg from '@/PlaceImg';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { RiLoader4Line } from 'react-icons/ri';
 
 function PlacesPage() {
   const [places, setPlaces] = useState([]);
@@ -63,7 +64,7 @@ function PlacesPage() {
       </div>
       <div className="mt-6">
         {loading ? (
-          <div>Loading...</div>
+          <div className="fixed inset-0 flex items-center justify-center bg-white/60 z-10"><RiLoader4Line className="animate-spin text-6xl text-primary" /></div>
         ) : places.length > 0 ? (
           places.map((place) => (
             <Link

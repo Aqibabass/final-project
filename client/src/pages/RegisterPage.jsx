@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { RiLoader4Line } from 'react-icons/ri';
 
 function RegisterPage() {
   const [name, setName] = useState('');
@@ -65,7 +66,7 @@ function RegisterPage() {
             className={`primary ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={loading}
           >
-            {loading ? 'Registering...' : 'Register'}
+            {loading ? <RiLoader4Line className="animate-spin mx-auto text-2xl" /> : 'Register'}
           </button>
           <div className="text-center py-2 text-gray-500">
             Already a member?{' '}

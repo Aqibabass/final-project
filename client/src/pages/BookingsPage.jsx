@@ -4,6 +4,7 @@ import axios from 'axios';
 import AccountNav from '@/AccountNav';
 import BookingDates from '@/BookingDates';
 import PlaceImg from '@/PlaceImg';
+import { RiLoader4Line } from 'react-icons/ri';
 
 function BookingsPage() {
   const [bookings, setBookings] = useState([]);
@@ -38,7 +39,7 @@ function BookingsPage() {
       <AccountNav />
       <div className="mt-6">
         {loading ? (
-          <div>Loading...</div>
+          <div className="fixed inset-0 flex items-center justify-center bg-white/60 z-10"><RiLoader4Line className="animate-spin text-6xl text-primary" /></div>
         ) : bookings.length === 0 ? (
           <div className="items-center text-xl font-bold mb-4">No bookings available</div>
           

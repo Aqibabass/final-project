@@ -5,6 +5,7 @@ import { Navigate, useParams } from 'react-router-dom';
 import PlacesPage from './PlacesPage';
 import AccountNav from '@/AccountNav';
 import ProfileCard from '@/components/ProfileCard';
+import { RiLoader4Line } from 'react-icons/ri';
 
 
 function ProfilePage() {
@@ -38,7 +39,7 @@ function ProfilePage() {
   }
 
   if (!ready) {
-    return 'Loading...';
+    return <div className="fixed inset-0 flex items-center justify-center bg-white/60 z-10"><RiLoader4Line className="animate-spin text-6xl text-primary" /></div>;
   }
 
   if (ready && !user && !redirect) {

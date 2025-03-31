@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { TiArrowBackOutline, TiCancel } from "react-icons/ti";
 import { FaRegTrashAlt } from 'react-icons/fa';
+import { RiLoader4Line } from 'react-icons/ri';
 import StaticMap from '@/StaticMap';
 import Footer from '@/components/ui/custom/Footer';
 
@@ -39,7 +40,7 @@ function BookingPage() {
   };
 
   if (!booking) {
-    return <div>Loading...</div>;
+    return <div className="fixed inset-0 flex items-center justify-center bg-white/60 z-10"><RiLoader4Line className="animate-spin text-6xl text-primary" /></div>;
   }
 
   return (

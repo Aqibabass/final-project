@@ -10,6 +10,7 @@ import { FaWifi, FaParking, FaTv, FaPaw } from 'react-icons/fa';
 import { HiOutlineRadio } from "react-icons/hi2";
 import { MdAcUnit, MdLock } from 'react-icons/md';
 import { AiOutlineHome } from 'react-icons/ai';
+import { RiLoader4Line } from 'react-icons/ri';
 
 function PlacePage() {
   const { id } = useParams();
@@ -28,7 +29,7 @@ function PlacePage() {
     });
   }, [id]);
 
-  if (!place) return <div>Loading...</div>;
+  if (!place) return <div className="fixed inset-0 flex items-center justify-center bg-white/60 z-10"><RiLoader4Line className="animate-spin text-6xl text-primary" /></div>;
 
   const toggleDescription = () => setIsExpanded(prev => !prev);
 
@@ -42,7 +43,7 @@ function PlacePage() {
       <PlaceGallery place={place} />
 
       <div className="text-xl mt-8 font-semibold bg-white -mx-8 px-8 py-8 border-b border-t">
-        Hosted By: {place.owner ? place.owner.name.charAt(0).toUpperCase() + place.owner.name.slice(1) : 'Loading...'}
+        Hosted By: {place.owner ? place.owner.name.charAt(0).toUpperCase() + place.owner.name.slice(1) : <RiLoader4Line className="animate-spin inline text-xl ml-1" />}
       </div>
 
       <div className='mt-4 mb-4 grid gap-8 grid-cols-1 md:grid-cols-[2fr_1fr]'>
