@@ -1,396 +1,165 @@
 const express = require('express');
 const cors = require('cors');
 const { default: mongoose } = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('./models/Users.js');
-const Place = require('./models/Place.js');
-const Booking = require('./models/Booking.js');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
-const axios = require('axios');
-const { Readable } = require('stream');
+const Razorpay = require('razorpay');
 const cloudinary = require('cloudinary').v2;
-const multer = require('multer');
-const fs = require('fs');
-const { OAuth2Client } = require('google-auth-library');
+
+// Import route files
+const { router: authRoutes } = require('./routes/auth');
+const placesRoutes = require('./routes/places');
+const bookingsRoutes = require('./routes/bookings');
+const uploadsRoutes = require('./routes/uploads');
+const paymentsRoutes = require('./routes/payments');
 
 const app = express();
-const bcryptSalt = bcrypt.genSaltSync(10);
-const jwtSecret = 'fasefrgcgjgcffddhfdh';
 
+// Initialize Razorpay
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
+// Make razorpay instance available to routes
+app.set('razorpay', razorpay);
+
+// Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
-
-
 app.use(cors({
-  origin: process.env.FRONTEND_URL, 
+  origin: process.env.FRONTEND_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URL);
 
+// Root route
 app.get("/", (req, res) => {
   res.send("Server is running!");
 });
 
-// Function to get user data from request
-function getUserDataFromReq(req) {
-  return new Promise((resolve, reject) => {
-    const token = req.cookies.token;
-    if (!token) return reject('No token provided');
-
-    jwt.verify(token, jwtSecret, {}, (err, userData) => {
-      if (err) return reject('Invalid token');
-      resolve(userData);
-    });
-  });
-}
-
+// Test route
 app.get('/test', (req, res) => {
   res.json('testggh ok');
 });
 
-app.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
+// Use route files
+app.use('/auth', authRoutes);
+app.use('/places', placesRoutes);
+app.use('/bookings', bookingsRoutes);
+app.use('/upload', uploadsRoutes);
+app.use('/payments', paymentsRoutes);
 
-  try {
-    const userDoc = await User.create({
-      name,
-      email,
-      password: bcrypt.hashSync(password, bcryptSalt),
-    });
 
-    res.json(userDoc);
-  } catch (e) {
-    res.status(422).json(e);
-  }
+
+// Auth routes - redirect to the appropriate paths in the auth router
+app.post('/register', (req, res, next) => {
+  req.url = '/register';
+  authRoutes(req, res, next);
 });
 
-// Login route with JWT authentication
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const userDoc = await User.findOne({ email });
-    if (!userDoc) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const passOk = bcrypt.compareSync(password, userDoc.password);
-    if (!passOk) {
-      return res.status(401).json({ message: 'Invalid email or password' });
-    }
-
-    jwt.sign(
-      { email: userDoc.email, id: userDoc._id },
-      jwtSecret,
-      {},
-      (err, token) => {
-        if (err) throw err;
-        res.cookie('token', token, {
-          httpOnly: true,
-          secure: true, // Required for HTTPS
-          sameSite: 'none', // Allow cross-site cookies
-          path: '/', // Accessible across all paths
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        }).json(userDoc);
-      }
-    );
-  } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ message: 'Server error. Please try again later.' });
-  }
+app.post('/login', (req, res, next) => {
+  req.url = '/login';
+  authRoutes(req, res, next);
 });
 
-app.get('/profile', async (req, res) => {
-  const { token } = req.cookies;
-  if (!token) return res.json(null);
-
-  try {
-    const userData = await getUserDataFromReq(req);
-    const { name, email, _id, avatar } = await User.findById(userData.id);
-    res.json({ name, email, _id, avatar });
-  } catch (error) {
-    res.status(401).json({ error: 'Unauthorized' });
-  }
+app.get('/profile', (req, res, next) => {
+  req.url = '/profile';
+  authRoutes(req, res, next);
 });
 
-// Logout route
-app.post('/logout', (req, res) => {
-  res.cookie('token', '', {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-    path: '/',
-    expires: new Date(0), // Expire immediately
-  }).json(true);
+app.post('/logout', (req, res, next) => {
+  req.url = '/logout';
+  authRoutes(req, res, next);
 });
 
-// Image upload via URL
-app.post('/upload-by-link', async (req, res) => {
-  const { link } = req.body;
-
-  if (!link || !link.startsWith('http')) {
-    return res.status(400).json({ error: 'Valid image URL is required' });
-  }
-
-  try {
-    const response = await axios.get(link, { responseType: 'arraybuffer' });
-
-    const imageStream = new Readable();
-    imageStream.push(response.data);
-    imageStream.push(null);
-
-    const newName = 'photo' + Date.now();
-
-    const cloudinaryResponse = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'uploads', public_id: newName },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
-      imageStream.pipe(uploadStream);
-    });
-
-    res.json({ url: cloudinaryResponse.secure_url });
-  } catch (error) {
-    console.error('Image upload failed:', error);
-    res.status(500).json({ error: 'Failed to upload image' });
-  }
+app.post('/google-login', (req, res, next) => {
+  req.url = '/google-login';
+  authRoutes(req, res, next);
 });
 
-// File upload route (multiple files)
-const photosMiddleware = multer();
-
-app.post('/upload', photosMiddleware.array('photos', 100), async (req, res) => {
-  const uploadedFiles = [];
-
-  try {
-    for (const file of req.files) {
-      const timestamp = Date.now();
-      const extension = file.originalname.split('.').pop();
-      const newName = `photo${timestamp}`;
-
-      const cloudinaryResponse = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-          { folder: 'uploads', public_id: newName, resource_type: 'auto' },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        ).end(file.buffer);
-      });
-
-      uploadedFiles.push(cloudinaryResponse.secure_url);
-    }
-
-    res.json(uploadedFiles);
-  } catch (error) {
-    console.error('Image upload failed:', error);
-    res.status(500).json({ error: 'Failed to upload images' });
-  }
+app.put('/update-profile', (req, res, next) => {
+  req.url = '/update-profile';
+  authRoutes(req, res, next);
 });
 
-// Routes for creating and managing places
-app.post('/places', (req, res) => {
-  const { token } = req.cookies;
-  const { title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price } = req.body;
-  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    if (err) throw err;
-
-    const placeDoc = await Place.create({
-      owner: userData.id, title, address, photos: addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price,
-    });
-    res.json(placeDoc);
-  });
+// Upload routes
+app.post('/upload-by-link', (req, res, next) => {
+  req.url = '/by-link';
+  uploadsRoutes(req, res, next);
 });
 
-// Retrieve user's places
-app.get('/user-places', (req, res) => {
-  const { token } = req.cookies;
-  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    const { id } = userData;
-    res.json(await Place.find({ owner: id }));
-  });
+// Places routes
+app.get('/user-places', (req, res, next) => {
+  req.url = '/user-places';
+  placesRoutes(req, res, next);
 });
 
-// Get a specific place by ID
-app.get('/places/:id', async (req, res) => {
-  const { id } = req.params;
-  const place = await Place.findById(id).populate('owner', 'name');
-  if (!place) {
-    return res.status(404).json({ error: 'Place not found' });
-  }
-  res.json(place);
+// Payment routes
+app.post('/create-razorpay-order', (req, res, next) => {
+  req.url = '/create-razorpay-order';
+  paymentsRoutes(req, res, next);
 });
 
-// Update place information
-app.put('/places', async (req, res) => {
-  const { token } = req.cookies;
-  const { id, title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price } = req.body;
-
-  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    if (err) throw err;
-
-    const placeDoc = await Place.findById(id);
-    if (userData.id === placeDoc.owner.toString()) {
-      placeDoc.set({
-        title, address, photos: addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price,
-      });
-      await placeDoc.save();
-      res.json('ok');
-    }
-  });
+app.post('/verify-payment', (req, res, next) => {
+  req.url = '/verify-payment';
+  paymentsRoutes(req, res, next);
 });
 
-// Fetch all places
-app.get('/places', async (req, res) => {
-  res.json(await Place.find());
+// Bookings backward compatibility
+app.post('/bookings', (req, res, next) => {
+  req.url = '/';
+  bookingsRoutes(req, res, next);
 });
 
-// Booking routes
-app.post('/bookings', async (req, res) => {
-  const userData = await getUserDataFromReq(req);
-  const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body;
-
-  Booking.create({
-    place, checkIn, checkOut, numberOfGuests, name, phone, price, user: userData.id,
-  }).then((doc) => {
-    res.json(doc);
-  }).catch((err) => {
-    throw err;
-  });
+app.get('/bookings', (req, res, next) => {
+  req.url = '/';
+  bookingsRoutes(req, res, next);
 });
 
-// Get bookings for a user
-app.get('/bookings', async (req, res) => {
-  const userData = await getUserDataFromReq(req);
-  res.json(await Booking.find({ user: userData.id }).populate('place'));
+app.delete('/bookings/:id', (req, res) => {
+  bookingsRoutes(req, res);
 });
 
-// Cancel a booking
-app.delete('/bookings/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const deletedBooking = await Booking.findByIdAndDelete(id);
-    if (!deletedBooking) {
-      return res.status(404).json({ message: 'Booking not found' });
-    }
-    res.status(200).json({ message: 'Booking canceled successfully' });
-  } catch (error) {
-    console.error('Error canceling booking:', error);
-    res.status(500).json({ message: 'Server error while canceling booking' });
-  }
+// Places backward compatibility
+app.get('/places', (req, res, next) => {
+  req.url = '/';
+  placesRoutes(req, res, next);
 });
 
-// Profile update
-app.put('/update-profile', async (req, res) => {
-  const { token } = req.cookies;
-  const { username, password } = req.body;
-
-  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    if (err) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    const user = await User.findById(userData.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    user.name = username || user.name;
-    if (password) {
-      user.password = bcrypt.hashSync(password, bcryptSalt);
-    }
-
-    await user.save();
-    res.json({ message: 'Profile updated successfully', user });
-  });
+app.post('/places', (req, res, next) => {
+  req.url = '/';
+  placesRoutes(req, res, next);
 });
 
-// Delete a place
-app.delete('/places/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const deletedPlace = await Place.findByIdAndDelete(id);
-    if (!deletedPlace) {
-      return res.status(404).json({ error: 'Place not found' });
-    }
-    res.status(200).json({ message: 'Place deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting place:', error);
-    res.status(500).json({ error: 'Server error while deleting place' });
-  }
+app.put('/places', (req, res, next) => {
+  req.url = '/';
+  placesRoutes(req, res, next);
 });
 
-// Google login integration
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+app.get('/places/:id', (req, res) => {
+  placesRoutes(req, res);
+});
 
-app.post('/google-login', async (req, res) => {
-  const { token } = req.body;
+app.delete('/places/:id', (req, res) => {
+  placesRoutes(req, res);
+});
 
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID
-    });
-
-    const payload = ticket.getPayload();
-    const { sub: googleId, name, email, picture } = payload;
-
-    let user = await User.findOne({
-      $or: [
-        { googleId },
-        { email }
-      ]
-    });
-
-    if (!user) {
-      user = await User.create({
-        googleId,
-        name,
-        email,
-        avatar: picture
-      });
-    }
-
-    jwt.sign(
-      { email: user.email, id: user._id },
-      jwtSecret,
-      {},
-      (err, token) => {
-        if (err) throw err;
-        res.cookie('token', token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          path: '/',
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        }).json({
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          avatar: user.avatar
-        });
-      }
-    );
-  } catch (error) {
-    console.error('Google login error:', error);
-    res.status(500).json({ message: 'Error during Google login' });
-  }
+// Upload backward compatibility
+app.post('/upload', (req, res, next) => {
+  req.url = '/';
+  uploadsRoutes(req, res, next);
 });
 
 // Listen on the appropriate port

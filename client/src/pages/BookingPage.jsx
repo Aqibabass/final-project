@@ -6,6 +6,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { TiArrowBackOutline, TiCancel } from "react-icons/ti";
 import { FaRegTrashAlt } from 'react-icons/fa';
+import StaticMap from '@/StaticMap';
+import Footer from '@/components/ui/custom/Footer';
 
 function BookingPage() {
   const { id } = useParams();
@@ -41,6 +43,7 @@ function BookingPage() {
   }
 
   return (
+    <div>
     <div className=' mt-8 mb-8'>
       <h1 className='text-3xl sm:text-2xl'>{booking.place.title}</h1>
       <AddressLink className='text-sm sm:text-base'>
@@ -77,9 +80,18 @@ function BookingPage() {
       </div>
 
       <PlaceGallery place={booking.place} />
+      
     </div>
-
+    <div className="text-gray-500 text-sm mt-2 mb-8 ">
+      
+      <div className="text-xl font-semibold bg-white  ">
+        <p>Where you’ll be</p>
+        </div>
+  <StaticMap address={booking.place.address} />
+</div>
+    </div>
   );
 }
+
 
 export default BookingPage;

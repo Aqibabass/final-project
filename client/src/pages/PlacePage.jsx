@@ -1,6 +1,7 @@
 import AddressLink from '@/AddressLink';
 import BookingWidget from '@/BookingWidget';
 import PlaceGallery from '@/PlaceGallery';
+import StaticMap from '@/StaticMap';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -87,13 +88,24 @@ function PlacePage() {
         Check-in: {place.checkIn} <br />
         Check-out: {place.checkOut} <br />
         Max number of guests: {place.maxGuests}
+
+      </div>
+      <div className="text-xl font-semibold bg-white -mx-8 px-8 py-8 border-t">
+        <h2 className="mb-2 font-semibold text-2xl">Location</h2>
+        <p className="text-justify text-gray-700">
+          {place.locationDescription}
+        </p>
+        <div className="text-gray-500 text-sm mt-2">
+          Exact location provided after booking.
+          <StaticMap address={place.address} />
+        </div>
       </div>
 
       <div className=" -mx-8 px-8 py-8 border-t">
         <div className='mt-4'>
           <h2 className='font-semibold text-2xl'>Extra info</h2>
         </div>
-        <div className='mb-4 mt-2 text-sm text-gray-700 leading-5'>
+        <div className='mb-4 mt-2 text-sm text-justify text-gray-700 leading-5'>
           {place.extraInfo}
         </div>
       </div>

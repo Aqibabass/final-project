@@ -11,8 +11,10 @@ function BookingWidget({ place }) {
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [redirect, setRedirect] = useState('');
+    const [emailNotification, setEmailNotification] = useState(true);
+    const [smsNotification, setSmsNotification] = useState(true);
     const { user } = useContext(UserContext);
-
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         if (user) {
             setName(user.name);
@@ -24,37 +26,106 @@ function BookingWidget({ place }) {
         numberOfNights = differenceInCalendarDays(new Date(checkOut), new Date(checkIn));
     }
 
+    // Function to validate Indian phone number
+    const validateIndianPhoneNumber = (phone) => {
+        const indianPhoneRegex = /^(?:\+91)?[6789]\d{9}$/;
+        return indianPhoneRegex.test(phone);
+    };
+
     const isFormValid = () => {
-        return checkIn && checkOut && numberOfGuests > 0 && name.trim() && phone.trim();
+        if (!checkIn || !checkOut || numberOfGuests <= 0 || !name.trim() || !phone.trim()) {
+            alert("Please fill all fields!");
+            return false;
+        }
+        if (!validateIndianPhoneNumber(phone)) {
+            alert("Please enter a valid Indian phone number!");
+            return false;
+        }
+        return true;
     };
 
     const bookThisPlace = async () => {
-        if (!isFormValid()) {
-            alert('Please fill all fields!');
-            return;
-        }
+        if (!isFormValid()) return;
 
         if (!user) {
             alert('Please login to book a place!');
             return;
         }
 
+        setIsLoading(true);
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/bookings`, {
-                checkIn,
-                checkOut,
-                numberOfGuests,
-                name,
-                phone,
-                place: place._id,
-                price: numberOfNights * place.price,
+            const amount = numberOfNights * place.price;
+            const orderResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/create-razorpay-order`, {
+                amount,
             });
 
-            const bookingId = response.data._id;
-            setRedirect(`/account/bookings/${bookingId}`);
+            if (!orderResponse.data.id) {
+                throw new Error('Failed to create Razorpay order');
+            }
+
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount: orderResponse.data.amount,
+                currency: "INR",
+                name: "TravelMate AI",
+                description: `Booking for ${place.title} - ${numberOfNights} nights`,
+                order_id: orderResponse.data.id,
+                handler: async function (response) {
+                    try {
+                        const bookingData = {
+                            checkIn,
+                            checkOut,
+                            numberOfGuests,
+                            name,
+                            phone,
+                            place: place._id,
+                            price: amount,
+                            paymentId: response.razorpay_payment_id,
+                            orderId: orderResponse.data.id,
+                            signature: response.razorpay_signature,
+                            emailNotification,
+                            smsNotification,
+                        };
+
+                        const bookingResponse = await axios.post(
+                            `${import.meta.env.VITE_BASE_URL}/bookings`,
+                            bookingData,
+                            { withCredentials: true }
+                        );
+
+                        if (bookingResponse.data._id) {
+                            setRedirect(`/account/bookings/${bookingResponse.data._id}`);
+                        } else {
+                            throw new Error("Booking ID not received");
+                        }
+                    } catch (error) {
+                        console.error("Booking error:", error);
+                        alert(`Booking failed: ${error.response?.data?.error || error.message}`);
+                    }
+                    setIsLoading(false);
+                },
+                prefill: {
+                    name: user.name,
+                    email: user.email,
+                    contact: phone,
+                },
+                theme: {
+                    color: "#0d9488",
+                },
+                modal: {
+                    ondismiss: function () {
+                        setIsLoading(false);
+                        alert('Payment was cancelled');
+                    },
+                },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.open();
         } catch (error) {
-            console.error('Booking failed:', error);
-            alert('There was an error processing your booking. Please try again.');
+            console.error('Payment setup failed:', error);
+            alert(`Payment failed: ${error.response?.data?.error || error.message}`);
+            setIsLoading(false);
         }
     };
 
@@ -119,16 +190,45 @@ function BookingWidget({ place }) {
                                     value={phone}
                                     onChange={ev => setPhone(ev.target.value)}
                                 />
+
+                                <div className="my-4 py-3 px-4 border-t">
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            id="emailNotif"
+                                            checked={emailNotification}
+                                            onChange={ev => setEmailNotification(ev.target.checked)}
+                                        />
+                                        <label htmlFor="emailNotif">Receive booking confirmation via Email</label>
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <input
+                                            type="checkbox"
+                                            id="smsNotif"
+                                            checked={smsNotification}
+                                            onChange={ev => setSmsNotification(ev.target.checked)}
+                                        />
+                                        <label htmlFor="smsNotif">Receive booking confirmation via SMS</label>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </>
                 )}
             </div>
 
-            <button onClick={bookThisPlace} className='primary mt-4'>
-                Book this place
-                {numberOfNights > 0 && <span> ₹{numberOfNights * place.price}</span>}
-            </button>
+            <button 
+            onClick={bookThisPlace} 
+            className='primary mt-4'
+            disabled={isLoading}
+        >
+            {isLoading ? 'Processing...' : (
+                <>
+                    Book this place
+                    {numberOfNights > 0 && <span> ₹{numberOfNights * place.price}</span>}
+                </>
+            )}
+        </button>
         </div>
     );
 }

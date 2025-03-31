@@ -3,6 +3,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { LuMapPinHouse } from "react-icons/lu";
+import { googleLogout } from '@react-oauth/google';
 
 function Header({ handleSearch }) {
   const { user, setUser } = useContext(UserContext);
@@ -12,9 +13,12 @@ function Header({ handleSearch }) {
 
   const logout = async () => {
     try {
-      await axios.post('/logout');
+      await axios.post("/logout");
+      googleLogout();
+      localStorage.removeItem('user');
       setUser(null);
       navigate('/');
+      window.location.href = '/';
     } catch (err) {
       console.error('Logout failed', err);
     }
@@ -34,15 +38,14 @@ function Header({ handleSearch }) {
         <Link to={'/index'} className="flex items-center gap-1">
           <LuMapPinHouse className='size-7' />
           <span className={`font-bold text-xl ${location.pathname !== '/index' ? 'block' : 'hidden sm:block'}`}>
-  TravelMate AI
-</span>
-
+            TravelMate AI
+          </span>
         </Link>
 
         <div className="flex items-center gap-4">
           {location.pathname === '/index' && (
             <div className="flex bg-transparent items-center gap-2 border border-gray-300 rounded-full py-1 px-2 shadow-md shadow-gray-300 w-[180px] sm:w-[200px] md:w-52 lg:w-72">
-            <input
+              <input
                 type="search"
                 placeholder="Search Stay"
                 className=" px-2 flex-grow border-none bg-transparent outline-none text-xs sm:text-sm placeholder-gray-500 w-full"
@@ -77,22 +80,21 @@ function Header({ handleSearch }) {
             <div className={`rounded-full border border-gray-300 overflow-hidden ${!user?.avatar ? 'bg-gray-500' : ''}`}>
               {user?.avatar ? (
                 <img
-                src={user.avatar}
-                alt="Profile"
-                className="size-6 object-cover"
-                referrerPolicy="no-referrer"
-              />
+                  src={user.avatar}
+                  alt="Profile"
+                  className="size-6 object-cover"
+                  referrerPolicy="no-referrer"
+                />
               ) : (
                 <div className="bg-gray-500 text-white rounded-full border border-gray-500 overflow-hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 relative top-1">
-                  <path
-                    fillRule="evenodd"
-                    d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 relative top-1">
+                    <path
+                      fillRule="evenodd"
+                      d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
               )}
             </div>
             <div className="hidden sm:block">{user?.name}</div>
