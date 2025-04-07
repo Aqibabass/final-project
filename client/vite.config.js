@@ -11,9 +11,10 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    strictPort: true, 
-   
+    strictPort: true,
   },
-  plugins: [react()]
+  define: {
+    'import.meta.env.RAZORPAY_KEY_ID': JSON.stringify(process.env.RAZORPAY_KEY_ID),
+    'import.meta.env.RAZORPAY_KEY_SECRET': JSON.stringify(process.env.RAZORPAY_KEY_SECRET)
+  }
 });
-  
