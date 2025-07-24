@@ -38,7 +38,7 @@ function Header({ handleSearch }) {
         <Link to={'/index'} className="flex items-center gap-1">
           <LuMapPinHouse className='size-7' />
           <span className={`font-bold text-xl ${location.pathname !== '/index' ? 'block' : 'hidden sm:block'}`}>
-            TravelMate AI
+            TravelMate
           </span>
         </Link>
 
